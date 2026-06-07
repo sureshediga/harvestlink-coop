@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Next.js
+web/.next/
+web/out/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+web/.env.local
+
+# Local dev data
+web/data/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Netlify
+.netlify/
+
+# Build artifacts
+*.tsbuildinfo
