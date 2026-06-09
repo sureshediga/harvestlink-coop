@@ -43,6 +43,10 @@ create table if not exists applications (
 create index if not exists applications_created_at_idx on applications (created_at desc);
 create index if not exists applications_status_idx on applications (status);
 
+-- Optional: lock down direct public API access (service role still works)
+alter table members enable row level security;
+alter table applications enable row level security;
+
 -- Migration for existing tables:
 -- alter table members add column if not exists payment_provider text not null default 'stripe';
 -- alter table members add column if not exists paypal_order_id text unique;

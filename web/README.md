@@ -78,6 +78,19 @@ Run `netlify init` from the **repository root** (where `netlify.toml` lives), no
 
 Replace `localhost:3000` with your Netlify URL in the curl examples below.
 
+### Form submission fails (500 / 501)
+
+Membership and investment forms **require Supabase on Netlify**. Local JSON files do not work in production.
+
+1. Run `supabase/migration.sql` in the Supabase SQL editor (creates `members` and `applications` tables).
+2. In Netlify → **Site configuration → Environment variables**, set:
+   - `SUPABASE_URL` — no quotes, e.g. `https://xxxxx.supabase.co`
+   - `SUPABASE_SERVICE_ROLE_KEY` — the **service_role** key (not anon)
+3. **Clear cache and redeploy** (Deploys → Trigger deploy → Clear cache and deploy site).
+4. After deploy, submit again. If it still fails, open browser DevTools → Network → click the failed `manual` request and read the JSON `error` message.
+
+A **501** usually means the Next.js runtime did not handle the API route — confirm build logs show `Using Next.js Runtime - v5` and that `@netlify/plugin-nextjs` is installed.
+
 ## Admin: Pending Applications
 
 Export all membership applications (pending Zelle payments):

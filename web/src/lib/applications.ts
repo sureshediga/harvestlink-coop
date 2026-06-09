@@ -3,7 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { INVESTOR, MEMBERSHIP } from "./constants";
 import type { MemberInfo } from "./schemas";
-import { getSupabase } from "./supabase";
+import { getSupabase, isProductionHosting, requireSupabase } from "./supabase";
 
 export type ApplicationKind = "membership" | "investment";
 
@@ -41,7 +41,7 @@ async function writeLocalApplications(
 }
 
 async function listAllApplications(): Promise<PendingApplication[]> {
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { data, error } = await supabase
@@ -102,7 +102,7 @@ export async function createApplication(
     confirmedAt: null,
   };
 
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { error } = await supabase.from("applications").insert(mapToDb(application));
@@ -114,6 +114,10 @@ export async function createApplication(
     return application;
   }
 
+  if (isProductionHosting()) {
+    throw new Error("Database storage is unavailable.");
+  }
+
   const applications = await readLocalApplications();
   applications.push(application);
   await writeLocalApplications(applications);
@@ -123,7 +127,7 @@ export async function createApplication(
 export async function getApplicationByReference(
   referenceNumber: string
 ): Promise<PendingApplication | null> {
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { data, error } = await supabase
@@ -148,7 +152,7 @@ export async function getApplicationByReference(
 export async function listApplications(
   filters?: { kind?: ApplicationKind; status?: PendingApplication["status"] }
 ): Promise<PendingApplication[]> {
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     let query = supabase.from("applications").select("*").order("created_at", {
@@ -204,7 +208,7 @@ export async function confirmApplication(
     confirmedAt: new Date().toISOString(),
   };
 
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { error } = await supabase

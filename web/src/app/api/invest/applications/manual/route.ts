@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createApplication } from "@/lib/applications";
+import { publicApiErrorMessage } from "@/lib/api-errors";
 import { investmentCheckoutSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Manual investment application error:", error);
     return NextResponse.json(
-      { error: "Unable to submit application" },
+      { error: publicApiErrorMessage(error) },
       { status: 500 }
     );
   }

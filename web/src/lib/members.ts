@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import type { CreateMemberInput, MemberRecord } from "./members-types";
-import { getSupabase } from "./supabase";
+import { getSupabase, isProductionHosting, requireSupabase } from "./supabase";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "members.json");
@@ -29,7 +29,7 @@ async function generateMemberNumber(): Promise<string> {
 }
 
 export async function listMembers(): Promise<MemberRecord[]> {
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { data, error } = await supabase
@@ -50,7 +50,7 @@ export async function listMembers(): Promise<MemberRecord[]> {
 export async function getMemberBySessionId(
   sessionId: string
 ): Promise<MemberRecord | null> {
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { data, error } = await supabase
@@ -73,7 +73,7 @@ export async function getMemberBySessionId(
 export async function getMemberByPayPalOrderId(
   orderId: string
 ): Promise<MemberRecord | null> {
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { data, error } = await supabase
@@ -116,7 +116,7 @@ export async function createMember(
     createdAt: new Date().toISOString(),
   };
 
-  const supabase = getSupabase();
+  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
     const { error } = await supabase.from("members").insert(mapToDb(record));
@@ -126,6 +126,10 @@ export async function createMember(
     }
 
     return record;
+  }
+
+  if (isProductionHosting()) {
+    throw new Error("Database storage is unavailable.");
   }
 
   const members = await readLocalMembers();
