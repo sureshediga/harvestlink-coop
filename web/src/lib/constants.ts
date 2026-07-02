@@ -17,7 +17,7 @@ export const FRAMING_NOTE =
 export const MEMBERSHIP = {
   joiningFee: 100,
   monthlyPurchaseCommitment: 25,
-  title: "Consumer Membership",
+  title: "Membership",
   summary:
     "Become an owner of the cooperative with democratic governance rights and access to traceable, region-specific groceries sourced directly from FPO partners in India.",
   benefits: [
@@ -77,7 +77,6 @@ export const NAV_LINKS = [
   { href: "/how-it-works", label: "How It Works" },
   { href: "/farmers", label: "FPO Partners" },
   { href: "/membership", label: "Membership" },
-  { href: "/invest", label: "Invest" },
   { href: "/texas", label: "Texas" },
   { href: "/faq", label: "FAQ" },
 ] as const;
@@ -278,7 +277,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is the difference between membership and investment?",
     answer:
-      "Membership (USD 100 joining fee) gives you ownership, voting rights, and access to cooperative products. Optional investment (USD 100 multiples) is separate patron capital that may earn proportional dividends — but every member has equal voting power regardless of investment.",
+      "Online signup is for the standard USD 100 membership. For other membership and investment opportunities, please call 614-961-9552.",
   },
   {
     question: "How does the FPO linkage work?",
@@ -303,10 +302,10 @@ export const FAQ_ITEMS = [
   {
     question: "Can I invest without being a member?",
     answer:
-      "Cooperative investment is designed for members. Join as a member first, then invest additional capital in multiples of USD 100 on our Invest page.",
+      "For other membership and investment opportunities, please call 614-961-9552.",
   },
 ] as const;
 
-export const MEMBERSHIP_TERMS = `By joining HarvestLink Cooperative, I acknowledge the USD 100 one-time joining fee and USD 25/month minimum purchase commitment once products are available. I understand that membership grants one equal vote per household in cooperative governance, that the board is elected by members, and that I am applying for consumer membership — not an investment contract. I agree to the cooperative principles of democratic member control, FPO-only sourcing, and community ownership.`;
+export const MEMBERSHIP_TERMS = `By joining HarvestLink Cooperative, I acknowledge the USD 100 one-time joining fee and USD 25/month minimum purchase commitment once products are available. I understand that membership grants one equal vote per household in cooperative governance, that the board is elected by members, and that I am applying for membership — not an investment contract. I agree to the cooperative principles of democratic member control, FPO-only sourcing, and community ownership.`;
 
 export const INVESTMENT_TERMS = `By investing in HarvestLink Cooperative, I acknowledge this is patron capital in multiples of USD 100, separate from my membership fee. I understand dividends may be proportional to my investment, that voting rights remain equal for all members (one member, one vote), and that investment carries cooperative business risk. I agree to the cooperative investment terms and confirm I am or will become a cooperative member.`;

@@ -1,4 +1,5 @@
 import { CTABand } from "@/components/CTABand";
+import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { PageHero, Section } from "@/components/PageShell";
 import { FAQ_ITEMS } from "@/lib/constants";
 
@@ -12,7 +13,7 @@ export default function FAQPage() {
       <PageHero
         eyebrow="Questions"
         title="Frequently Asked Questions"
-        description="Everything you need to know about membership, investment, and our Texas opening."
+        description="Everything you need to know about membership and our Texas opening."
       />
 
       <Section>
@@ -32,6 +33,7 @@ export default function FAQPage() {
             </details>
           ))}
         </div>
+        <OtherMembershipNote className="mx-auto mt-8 max-w-md text-center" />
       </Section>
 
       <CTABand />

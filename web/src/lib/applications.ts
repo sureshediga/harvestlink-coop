@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import { INVESTOR, MEMBERSHIP } from "./constants";
-import type { MemberInfo } from "./schemas";
+import type { MemberInfo, MembershipAcknowledgements } from "./schemas";
 import { getSupabase, isProductionHosting, requireSupabase } from "./supabase";
 
 export type ApplicationKind = "membership" | "investment";
@@ -19,6 +19,7 @@ export type PendingApplication = MemberInfo & {
   status: "pending_payment" | "confirmed";
   createdAt: string;
   confirmedAt: string | null;
+  acknowledgements?: MembershipAcknowledgements | null;
 };
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -72,6 +73,7 @@ export async function createApplication(
     kind: ApplicationKind;
     investmentUnits?: number;
     memberNumber?: string;
+    acknowledgements?: MembershipAcknowledgements;
   }
 ): Promise<PendingApplication> {
   const referenceNumber = await generateReferenceNumber(input.kind);
@@ -100,6 +102,7 @@ export async function createApplication(
     status: "pending_payment",
     createdAt: new Date().toISOString(),
     confirmedAt: null,
+    acknowledgements: input.acknowledgements ?? null,
   };
 
   const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
@@ -255,6 +258,7 @@ function mapToDb(application: PendingApplication) {
     status: application.status,
     created_at: application.createdAt,
     confirmed_at: application.confirmedAt,
+    acknowledgements: application.acknowledgements ?? null,
   };
 }
 
@@ -278,6 +282,9 @@ function mapFromDb(row: Record<string, unknown>): PendingApplication {
     status: row.status as PendingApplication["status"],
     createdAt: String(row.created_at),
     confirmedAt: row.confirmed_at ? String(row.confirmed_at) : null,
+    acknowledgements: row.acknowledgements
+      ? (row.acknowledgements as MembershipAcknowledgements)
+      : null,
   };
 }
 
@@ -300,6 +307,10 @@ export function applicationsToCsv(
     "investment_amount",
     "total_amount",
     "member_number",
+    "compliance_signed_name",
+    "compliance_signed_date",
+    "enrollment_signed_name",
+    "enrollment_signed_date",
     "created_at",
     "confirmed_at",
   ];
@@ -321,6 +332,10 @@ export function applicationsToCsv(
       (app.investmentAmount / 100).toFixed(2),
       (app.totalAmount / 100).toFixed(2),
       app.memberNumber ?? "",
+      app.acknowledgements?.compliance.signedName ?? "",
+      app.acknowledgements?.compliance.signedDate ?? "",
+      app.acknowledgements?.enrollmentDisclosure.signedName ?? "",
+      app.acknowledgements?.enrollmentDisclosure.signedDate ?? "",
       app.createdAt,
       app.confirmedAt ?? "",
     ]

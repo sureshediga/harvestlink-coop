@@ -1,5 +1,22 @@
 import { z } from "zod";
 
+export const formAcknowledgementSchema = z.object({
+  signedName: z.string().min(2, "Printed name is required"),
+  signedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Valid date is required"),
+  acknowledgedAt: z.string().datetime(),
+});
+
+export type FormAcknowledgement = z.infer<typeof formAcknowledgementSchema>;
+
+export const membershipAcknowledgementsSchema = z.object({
+  compliance: formAcknowledgementSchema,
+  enrollmentDisclosure: formAcknowledgementSchema,
+});
+
+export type MembershipAcknowledgements = z.infer<
+  typeof membershipAcknowledgementsSchema
+>;
+
 export const memberInfoSchema = z.object({
   fullName: z.string().min(2, "Full name is required"),
   email: z.string().email("Valid email is required"),
@@ -19,6 +36,7 @@ export const membershipCheckoutSchema = memberInfoSchema.extend({
   agreedToTerms: z.literal(true, {
     message: "You must agree to membership terms",
   }),
+  acknowledgements: membershipAcknowledgementsSchema,
 });
 
 export const investmentCheckoutSchema = memberInfoSchema.extend({

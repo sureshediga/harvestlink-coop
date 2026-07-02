@@ -3,8 +3,18 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  AcknowledgementModal,
+  FormAcknowledgementRow,
+} from "./AcknowledgementModal";
+import { OtherMembershipNote } from "./OtherMembershipNote";
 import { StepIndicator } from "./StepIndicator";
 import { MEMBERSHIP, MEMBERSHIP_TERMS, PILLARS } from "@/lib/constants";
+import {
+  MEMBERSHIP_DISCLAIMERS,
+  type DisclaimerId,
+} from "@/lib/disclaimers";
+import type { FormAcknowledgement } from "@/lib/schemas";
 import { memberInfoSchema, type MemberInfo } from "@/lib/schemas";
 
 const STEPS = ["Why Join", "Your Info", "Review & Pay"];
@@ -12,6 +22,15 @@ const STEPS = ["Why Join", "Your Info", "Review & Pay"];
 export function JoinForm() {
   const [step, setStep] = useState(1);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [complianceAck, setComplianceAck] = useState<FormAcknowledgement | null>(
+    null
+  );
+  const [enrollmentAck, setEnrollmentAck] = useState<FormAcknowledgement | null>(
+    null
+  );
+  const [openDisclaimer, setOpenDisclaimer] = useState<DisclaimerId | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<"manual" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +50,27 @@ export function JoinForm() {
 
   const totalCents = MEMBERSHIP.joiningFee * 100;
 
+  function handleAcknowledgement(
+    disclaimerId: DisclaimerId,
+    acknowledgement: FormAcknowledgement
+  ) {
+    if (disclaimerId === "compliance") {
+      setComplianceAck(acknowledgement);
+    } else {
+      setEnrollmentAck(acknowledgement);
+    }
+    setOpenDisclaimer(null);
+    setError(null);
+  }
+
   async function submitManualApplication() {
+    if (!complianceAck || !enrollmentAck) {
+      setError(
+        "Please read and sign both the Compliance & Acknowledgement Form and the Membership Enrollment & Disclosure Form."
+      );
+      return;
+    }
+
     if (!agreedToTerms) {
       setError("Please agree to the membership terms to continue.");
       return;
@@ -45,7 +84,14 @@ export function JoinForm() {
       const response = await fetch("/api/applications/manual", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form.getValues(), agreedToTerms: true }),
+        body: JSON.stringify({
+          ...form.getValues(),
+          agreedToTerms: true,
+          acknowledgements: {
+            compliance: complianceAck,
+            enrollmentDisclosure: enrollmentAck,
+          },
+        }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Unable to submit");
@@ -177,6 +223,26 @@ export function JoinForm() {
             </div>
           </dl>
 
+          <div className="mt-6 space-y-3">
+            <p className="text-sm font-semibold text-soil">
+              Required acknowledgements
+            </p>
+            <FormAcknowledgementRow
+              label="I have read and signed the HarvestLinx Member Compliance & Acknowledgement Form."
+              acknowledged={Boolean(complianceAck)}
+              signedName={complianceAck?.signedName}
+              signedDate={complianceAck?.signedDate}
+              onOpen={() => setOpenDisclaimer("compliance")}
+            />
+            <FormAcknowledgementRow
+              label="I have read and signed the HarvestLinx Membership Enrollment & Disclosure Form."
+              acknowledged={Boolean(enrollmentAck)}
+              signedName={enrollmentAck?.signedName}
+              signedDate={enrollmentAck?.signedDate}
+              onOpen={() => setOpenDisclaimer("enrollmentDisclosure")}
+            />
+          </div>
+
           <label className="mt-6 flex items-start gap-3">
             <input
               type="checkbox"
@@ -213,17 +279,26 @@ export function JoinForm() {
             </button>
           </div>
 
-          <p className="mt-4 text-center text-xs text-soil/50">
-            Want to invest patron capital separately?{" "}
-            <a href="/invest" className="font-medium text-green hover:underline">
-              Go to Invest & Earn →
-            </a>
-          </p>
+          <OtherMembershipNote className="mt-6 rounded-xl border border-gold/15 bg-cream/30 p-4" />
 
           <button type="button" onClick={() => setStep(2)} className="mt-6 text-sm font-medium text-soil/60 hover:text-soil">
             ← Back to your information
           </button>
         </div>
+      )}
+
+      {openDisclaimer && (
+        <AcknowledgementModal
+          disclaimer={MEMBERSHIP_DISCLAIMERS[openDisclaimer]}
+          defaultName={form.getValues("fullName")}
+          existingAcknowledgement={
+            openDisclaimer === "compliance" ? complianceAck : enrollmentAck
+          }
+          onClose={() => setOpenDisclaimer(null)}
+          onAcknowledge={(acknowledgement) =>
+            handleAcknowledgement(openDisclaimer, acknowledgement)
+          }
+        />
       )}
     </div>
   );

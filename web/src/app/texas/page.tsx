@@ -1,5 +1,6 @@
 import { CTABand } from "@/components/CTABand";
 import { InlineCTA, PageHero, Section } from "@/components/PageShell";
+import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { MEMBERSHIP } from "@/lib/constants";
 
 export const metadata = {
@@ -64,11 +65,12 @@ export default function TexasPage() {
           ))}
         </div>
         <InlineCTA text={`Become a Member — $${MEMBERSHIP.joiningFee}`} />
+        <OtherMembershipNote className="mx-auto mt-8 max-w-md text-center" />
       </Section>
 
       <CTABand
         title="Be a founding member in Texas"
-        description={`Join for $${MEMBERSHIP.joiningFee} and receive updates as we approach our store opening. Optional patron investment is separate.`}
+        description={`Join for $${MEMBERSHIP.joiningFee} and receive updates as we approach our store opening.`}
         buttonText={`Become a Member — $${MEMBERSHIP.joiningFee}`}
       />
     </>

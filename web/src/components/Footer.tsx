@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { OtherMembershipNote } from "./OtherMembershipNote";
 import { MEMBERSHIP, NAV_LINKS, SITE } from "@/lib/constants";
+import { MANUAL_PAYMENT } from "@/lib/manual-payment";
 
 export function Footer() {
   return (
@@ -51,19 +53,23 @@ export function Footer() {
               {SITE.contactEmail}
             </a>
           </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <p className="mt-4 text-sm text-cream/80">
+            Phone:{" "}
+            <a
+              href={`tel:+1${MANUAL_PAYMENT.zellePhone.replace(/\D/g, "")}`}
+              className="text-gold hover:underline"
+            >
+              {MANUAL_PAYMENT.zellePhone}
+            </a>
+          </p>
+          <div className="mt-6">
             <Link
               href="/join"
               className="inline-block rounded-full bg-saffron px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-saffron/90"
             >
               Join — ${MEMBERSHIP.joiningFee}
             </Link>
-            <Link
-              href="/invest"
-              className="inline-block rounded-full border border-cream/40 px-6 py-3 text-center text-sm font-semibold text-cream transition hover:border-gold hover:text-gold"
-            >
-              Invest & Earn
-            </Link>
+            <OtherMembershipNote className="mt-4 text-cream/70 [&_a]:text-gold" />
           </div>
         </div>
       </div>

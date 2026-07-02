@@ -5,6 +5,8 @@ export type MemberAddress = {
   zip: string;
 };
 
+import type { MembershipAcknowledgements } from "./schemas";
+
 export type PaymentProvider = "stripe" | "paypal" | "manual";
 
 export type MemberRecord = {
@@ -23,6 +25,7 @@ export type MemberRecord = {
   stripePaymentIntentId: string | null;
   paypalOrderId: string | null;
   isFoundingMember: boolean;
+  acknowledgements?: MembershipAcknowledgements | null;
   createdAt: string;
 };
 

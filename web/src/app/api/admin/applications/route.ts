@@ -86,6 +86,7 @@ export async function POST(request: Request) {
       paypalOrderId: null,
       isFoundingMember: true,
       membershipPaid: application.kind === "membership",
+      acknowledgements: application.acknowledgements ?? null,
     });
 
     await confirmApplication(referenceNumber);

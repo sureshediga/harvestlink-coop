@@ -17,8 +17,15 @@ export async function POST(request: Request) {
 
     const data = parsed.data;
     const application = await createApplication({
-      ...data,
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      street: data.street,
+      city: data.city,
+      state: data.state,
+      zip: data.zip,
       kind: "membership",
+      acknowledgements: data.acknowledgements,
     });
 
     return NextResponse.json({

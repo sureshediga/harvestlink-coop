@@ -1,56 +1,44 @@
 import Link from "next/link";
-import { Suspense } from "react";
-import { InvestForm } from "@/components/InvestForm";
-import { INVESTOR, MEMBERSHIP } from "@/lib/constants";
+import { CTABand } from "@/components/CTABand";
+import { OtherMembershipNote } from "@/components/OtherMembershipNote";
+import { PageHero, Section } from "@/components/PageShell";
+import { MEMBERSHIP } from "@/lib/constants";
+import { MANUAL_PAYMENT } from "@/lib/manual-payment";
 
 export const metadata = {
-  title: "Invest & Earn",
+  title: "Other Membership & Investment Opportunities",
 };
 
-export default function InvestPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ cancelled?: string }>;
-}) {
+export default function InvestPage() {
+  const phoneHref = `tel:+1${MANUAL_PAYMENT.zellePhone.replace(/\D/g, "")}`;
+
   return (
     <>
-      <CancelledNotice searchParams={searchParams} />
-      <section className="border-b border-gold/20 bg-white px-4 py-12 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-terracotta">
-            Patron Capital
-          </p>
-          <h1 className="mt-2 font-serif text-3xl font-semibold text-soil sm:text-4xl">
-            {INVESTOR.title}
-          </h1>
-          <p className="mt-4 text-soil/75">{INVESTOR.summary}</p>
-          <p className="mt-4 text-sm text-soil/60">
-            Separate from the ${MEMBERSHIP.joiningFee} membership fee.{" "}
-            <a href="/membership" className="font-medium text-green hover:underline">
-              View membership details
-            </a>
+      <PageHero
+        eyebrow="Contact us"
+        title="Other Membership & Investment Opportunities"
+        description={`Online signup is for the standard $${MEMBERSHIP.joiningFee} membership. For other options, please call us directly.`}
+      />
+
+      <Section>
+        <div className="mx-auto max-w-xl rounded-2xl border border-gold/20 bg-white p-8 text-center shadow-sm">
+          <OtherMembershipNote className="text-base text-soil/80" />
+          <a
+            href={phoneHref}
+            className="mt-6 inline-block rounded-full bg-green px-8 py-3.5 text-sm font-semibold text-white hover:bg-green/90"
+          >
+            Call {MANUAL_PAYMENT.zellePhone}
+          </a>
+          <p className="mt-6 text-sm text-soil/60">
+            Ready for standard membership?{" "}
+            <Link href="/join" className="font-medium text-green hover:underline">
+              Apply online — ${MEMBERSHIP.joiningFee}
+            </Link>
           </p>
         </div>
-      </section>
-      <Suspense fallback={<div className="py-20 text-center text-soil/60">Loading...</div>}>
-        <InvestForm />
-      </Suspense>
-    </>
-  );
-}
+      </Section>
 
-async function CancelledNotice({
-  searchParams,
-}: {
-  searchParams: Promise<{ cancelled?: string }>;
-}) {
-  const params = await searchParams;
-  if (params.cancelled !== "true") return null;
-  return (
-    <div className="mx-auto max-w-2xl px-4 pt-6 sm:px-6">
-      <p className="rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-soil">
-        Investment payment was cancelled. You can try again when ready.
-      </p>
-    </div>
+      <CTABand />
+    </>
   );
 }

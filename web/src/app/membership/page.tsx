@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CTABand } from "@/components/CTABand";
+import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { PageHero, Section } from "@/components/PageShell";
 import { WaysToPay } from "@/components/WaysToPay";
 import { GOVERNANCE_SAFEGUARDS, MEMBERSHIP } from "@/lib/constants";
@@ -12,7 +13,7 @@ export default function MembershipPage() {
   return (
     <>
       <PageHero
-        eyebrow="Consumer Membership"
+        eyebrow="Membership"
         title={MEMBERSHIP.title}
         description={MEMBERSHIP.summary}
       />
@@ -84,12 +85,7 @@ export default function MembershipPage() {
           >
             Start Membership Application — ${MEMBERSHIP.joiningFee}
           </Link>
-          <p className="mt-4 text-sm text-soil/60">
-            Investment is separate.{" "}
-            <Link href="/invest" className="font-medium text-green hover:underline">
-              Learn about investing →
-            </Link>
-          </p>
+          <OtherMembershipNote className="mx-auto mt-6 max-w-md text-center" />
         </div>
       </Section>
 

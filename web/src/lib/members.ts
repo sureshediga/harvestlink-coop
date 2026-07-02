@@ -113,6 +113,7 @@ export async function createMember(
     stripePaymentIntentId: input.stripePaymentIntentId,
     paypalOrderId: input.paypalOrderId,
     isFoundingMember: input.isFoundingMember,
+    acknowledgements: input.acknowledgements ?? null,
     createdAt: new Date().toISOString(),
   };
 
@@ -155,6 +156,7 @@ function mapToDb(record: MemberRecord) {
     stripe_payment_intent_id: record.stripePaymentIntentId,
     paypal_order_id: record.paypalOrderId,
     is_founding_member: record.isFoundingMember,
+    acknowledgements: record.acknowledgements ?? null,
     created_at: record.createdAt,
   };
 }
@@ -178,6 +180,9 @@ function mapFromDb(row: Record<string, unknown>): MemberRecord {
       : null,
     paypalOrderId: row.paypal_order_id ? String(row.paypal_order_id) : null,
     isFoundingMember: Boolean(row.is_founding_member),
+    acknowledgements: row.acknowledgements
+      ? (row.acknowledgements as MemberRecord["acknowledgements"])
+      : null,
     createdAt: String(row.created_at),
   };
 }
@@ -197,6 +202,10 @@ export function membersToCsv(members: MemberRecord[]): string {
     "investment_amount",
     "payment_provider",
     "is_founding_member",
+    "compliance_signed_name",
+    "compliance_signed_date",
+    "enrollment_signed_name",
+    "enrollment_signed_date",
     "created_at",
   ];
 
@@ -215,6 +224,10 @@ export function membersToCsv(members: MemberRecord[]): string {
       (m.investmentAmount / 100).toFixed(2),
       m.paymentProvider,
       m.isFoundingMember,
+      m.acknowledgements?.compliance.signedName ?? "",
+      m.acknowledgements?.compliance.signedDate ?? "",
+      m.acknowledgements?.enrollmentDisclosure.signedName ?? "",
+      m.acknowledgements?.enrollmentDisclosure.signedDate ?? "",
       m.createdAt,
     ]
       .map((value) => `"${String(value).replace(/"/g, '""')}"`)

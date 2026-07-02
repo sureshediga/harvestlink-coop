@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { CTABand } from "@/components/CTABand";
 import { FarmerCard } from "@/components/FarmerCard";
+import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { PillarCard } from "@/components/PillarCard";
 import {
   FARMER_PARTNERS,
   FRAMING_NOTE,
   LOGISTICS_STAGES,
   MEMBERSHIP,
-  INVESTOR,
   PILLARS,
   PRODUCT_LINES,
 } from "@/lib/constants";
@@ -29,24 +29,18 @@ export default function HomePage() {
             Farmer Producer Organizations in India — for safe, traceable, culturally
             authentic food.
           </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div className="mt-10 flex flex-col items-center justify-center gap-4">
             <Link
               href="/join"
               className="inline-block rounded-full bg-saffron px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-saffron/90"
             >
               Become a Member — ${MEMBERSHIP.joiningFee}
             </Link>
-            <Link
-              href="/invest"
-              className="inline-block rounded-full border-2 border-green bg-white px-8 py-4 text-base font-semibold text-green transition hover:bg-green/5"
-            >
-              Invest & Earn
-            </Link>
           </div>
           <p className="mt-4 text-sm text-soil/60">
-            Membership: ${MEMBERSHIP.joiningFee} joining fee · Investment from $
-            {INVESTOR.unitAmount} in multiples · One member, one vote always
+            ${MEMBERSHIP.joiningFee} one-time joining fee · One member, one vote
           </p>
+          <OtherMembershipNote className="mx-auto mt-3 max-w-md text-center" />
         </div>
       </section>
 
@@ -107,7 +101,7 @@ export default function HomePage() {
       </section>
 
       <section className="bg-white px-4 py-16 sm:px-6">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2">
+        <div className="mx-auto max-w-2xl">
           <div className="rounded-2xl border-2 border-green/30 p-8">
             <h2 className="font-serif text-2xl font-semibold text-soil">
               Membership — ${MEMBERSHIP.joiningFee}
@@ -126,25 +120,7 @@ export default function HomePage() {
             >
               Join Now
             </Link>
-          </div>
-          <div className="rounded-2xl border border-gold/20 bg-cream/50 p-8">
-            <h2 className="font-serif text-2xl font-semibold text-soil">
-              Invest — from ${INVESTOR.unitAmount}
-            </h2>
-            <ul className="mt-4 space-y-2 text-sm text-soil/75">
-              {INVESTOR.benefits.slice(0, 4).map((b) => (
-                <li key={b}>✓ {b}</li>
-              ))}
-            </ul>
-            <Link href="/invest" className="mt-6 inline-block text-sm font-semibold text-green hover:underline">
-              Full investment details →
-            </Link>
-            <Link
-              href="/invest"
-              className="mt-4 block rounded-full border-2 border-green px-6 py-3 text-center text-sm font-semibold text-green hover:bg-green/5"
-            >
-              Invest Now
-            </Link>
+            <OtherMembershipNote className="mt-6 border-t border-gold/15 pt-6" />
           </div>
         </div>
       </section>

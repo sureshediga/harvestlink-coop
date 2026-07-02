@@ -14,6 +14,7 @@ create table if not exists members (
   stripe_payment_intent_id text,
   paypal_order_id text unique,
   is_founding_member boolean not null default true,
+  acknowledgements jsonb,
   created_at timestamptz not null default now()
 );
 
@@ -36,6 +37,7 @@ create table if not exists applications (
   total_amount integer not null,
   member_number text,
   status text not null default 'pending_payment' check (status in ('pending_payment', 'confirmed')),
+  acknowledgements jsonb,
   created_at timestamptz not null default now(),
   confirmed_at timestamptz
 );

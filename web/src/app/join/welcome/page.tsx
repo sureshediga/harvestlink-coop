@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FoundingMemberBadge } from "@/components/FoundingMemberBadge";
+import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { MEMBERSHIP } from "@/lib/constants";
 import {
   getMemberByPayPalOrderId,
@@ -106,27 +107,16 @@ export default async function WelcomePage({
           <li>A confirmation email has been sent to {member.email}</li>
           <li>You&apos;ll receive updates as our Texas store opening approaches</li>
           <li>As a member-owner, you have equal voting rights in cooperative governance</li>
-          <li>
-            Want to invest additional patron capital?{" "}
-            <Link href="/invest" className="font-medium text-green hover:underline">
-              Invest additional capital
-            </Link>
-          </li>
         </ul>
+        <OtherMembershipNote className="mt-4" />
       </div>
 
-      <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <div className="mt-8">
         <Link
           href="/"
           className="inline-block rounded-full bg-saffron px-8 py-3.5 text-sm font-semibold text-white hover:bg-saffron/90"
         >
           Back to Home
-        </Link>
-        <Link
-          href="/invest"
-          className="inline-block rounded-full border border-green px-8 py-3.5 text-sm font-semibold text-green hover:bg-green/5"
-        >
-          Invest & Earn
         </Link>
       </div>
     </div>

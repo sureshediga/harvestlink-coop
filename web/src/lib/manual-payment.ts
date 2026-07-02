@@ -3,3 +3,5 @@ export const MANUAL_PAYMENT = {
   confirmationNote:
     "Include your application reference number in the Zelle memo.",
 } as const;
+
+export const OTHER_MEMBERSHIP_OPPORTUNITIES_NOTE = `For other membership and investment opportunities, please call ${MANUAL_PAYMENT.zellePhone}.`;

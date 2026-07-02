@@ -29,12 +29,6 @@ export function Header() {
           >
             Join — ${MEMBERSHIP.joiningFee}
           </Link>
-          <Link
-            href="/invest"
-            className="hidden rounded-full border border-green px-4 py-2 text-sm font-semibold text-green sm:inline-block"
-          >
-            Invest
-          </Link>
         </nav>
 
         <div className="flex items-center gap-2 lg:hidden">
