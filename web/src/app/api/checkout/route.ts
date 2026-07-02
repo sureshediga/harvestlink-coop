@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { MEMBERSHIP } from "@/lib/constants";
-import { membershipCheckoutSchema } from "@/lib/schemas";
+import { membershipCheckoutSchema, memberInfoFromMembershipCheckout } from "@/lib/schemas";
 import { getSiteUrl } from "@/lib/site-url";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 
@@ -27,13 +27,14 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
+    const member = memberInfoFromMembershipCheckout(data);
     const siteUrl = getSiteUrl();
     const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
-      customer_email: data.email,
+      customer_email: member.email,
       line_items: [
         {
           price_data: {
@@ -51,13 +52,13 @@ export async function POST(request: Request) {
       cancel_url: `${siteUrl}/join?cancelled=true`,
       metadata: {
         kind: "membership",
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        street: data.street,
-        city: data.city,
-        state: data.state,
-        zip: data.zip,
+        fullName: member.fullName,
+        email: member.email,
+        phone: member.phone,
+        street: member.street,
+        city: member.city,
+        state: member.state,
+        zip: member.zip,
         investmentUnits: "0",
       },
     });

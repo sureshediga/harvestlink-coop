@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AcknowledgementModal,
   FormAcknowledgementRow,
@@ -14,10 +12,12 @@ import {
   MEMBERSHIP_DISCLAIMERS,
   type DisclaimerId,
 } from "@/lib/disclaimers";
-import type { FormAcknowledgement } from "@/lib/schemas";
-import { memberInfoSchema, type MemberInfo } from "@/lib/schemas";
+import type {
+  EnrollmentAcknowledgement,
+  FormAcknowledgement,
+} from "@/lib/schemas";
 
-const STEPS = ["Why Join", "Your Info", "Review & Pay"];
+const STEPS = ["Why Join", "Review & Sign"];
 
 export function JoinForm() {
   const [step, setStep] = useState(1);
@@ -25,9 +25,8 @@ export function JoinForm() {
   const [complianceAck, setComplianceAck] = useState<FormAcknowledgement | null>(
     null
   );
-  const [enrollmentAck, setEnrollmentAck] = useState<FormAcknowledgement | null>(
-    null
-  );
+  const [enrollmentAck, setEnrollmentAck] =
+    useState<EnrollmentAcknowledgement | null>(null);
   const [openDisclaimer, setOpenDisclaimer] = useState<DisclaimerId | null>(
     null
   );
@@ -35,29 +34,16 @@ export function JoinForm() {
   const [loadingProvider, setLoadingProvider] = useState<"manual" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<MemberInfo>({
-    resolver: zodResolver(memberInfoSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      phone: "",
-      street: "",
-      city: "",
-      state: "",
-      zip: "",
-    },
-  });
-
   const totalCents = MEMBERSHIP.joiningFee * 100;
 
   function handleAcknowledgement(
     disclaimerId: DisclaimerId,
-    acknowledgement: FormAcknowledgement
+    acknowledgement: FormAcknowledgement | EnrollmentAcknowledgement
   ) {
     if (disclaimerId === "compliance") {
-      setComplianceAck(acknowledgement);
+      setComplianceAck(acknowledgement as FormAcknowledgement);
     } else {
-      setEnrollmentAck(acknowledgement);
+      setEnrollmentAck(acknowledgement as EnrollmentAcknowledgement);
     }
     setOpenDisclaimer(null);
     setError(null);
@@ -85,7 +71,6 @@ export function JoinForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form.getValues(),
           agreedToTerms: true,
           acknowledgements: {
             compliance: complianceAck,
@@ -155,58 +140,15 @@ export function JoinForm() {
       )}
 
       {step === 2 && (
-        <form
-          onSubmit={form.handleSubmit(() => setStep(3))}
-          className="rounded-2xl border border-gold/20 bg-white p-6 shadow-sm sm:p-8"
-        >
-          <h2 className="font-serif text-2xl font-semibold text-soil">
-            Your Information
-          </h2>
-          <p className="mt-2 text-sm text-soil/70">
-            Membership is one per household. We&apos;ll register your cooperative
-            membership and send Texas chapter updates.
-          </p>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <Field label="Full name" error={form.formState.errors.fullName?.message} className="sm:col-span-2">
-              <input {...form.register("fullName")} className={inputClass} />
-            </Field>
-            <Field label="Email" error={form.formState.errors.email?.message}>
-              <input {...form.register("email")} type="email" className={inputClass} />
-            </Field>
-            <Field label="Phone" error={form.formState.errors.phone?.message}>
-              <input {...form.register("phone")} type="tel" className={inputClass} />
-            </Field>
-            <Field label="Street address" error={form.formState.errors.street?.message} className="sm:col-span-2">
-              <input {...form.register("street")} className={inputClass} />
-            </Field>
-            <Field label="City" error={form.formState.errors.city?.message}>
-              <input {...form.register("city")} className={inputClass} />
-            </Field>
-            <Field label="State" error={form.formState.errors.state?.message}>
-              <input {...form.register("state")} className={inputClass} />
-            </Field>
-            <Field label="ZIP code" error={form.formState.errors.zip?.message}>
-              <input {...form.register("zip")} className={inputClass} />
-            </Field>
-          </div>
-
-          <div className="mt-8 flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="rounded-full border border-gold/30 px-6 py-3 text-sm font-semibold text-soil">
-              Back
-            </button>
-            <button type="submit" className="flex-1 rounded-full bg-saffron py-3 font-semibold text-white hover:bg-saffron/90">
-              Continue to Review
-            </button>
-          </div>
-        </form>
-      )}
-
-      {step === 3 && (
         <div className="rounded-2xl border border-gold/20 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="font-serif text-2xl font-semibold text-soil">
-            Membership Review & Pay
+            Membership Review & Sign
           </h2>
+          <p className="mt-2 text-sm text-soil/70">
+            Complete both acknowledgement forms below. Your name, contact details,
+            and address are collected in the Membership Enrollment & Disclosure
+            Form.
+          </p>
 
           <dl className="mt-6 space-y-3 border-b border-gold/20 pb-6">
             <div className="flex justify-between text-soil">
@@ -235,7 +177,7 @@ export function JoinForm() {
               onOpen={() => setOpenDisclaimer("compliance")}
             />
             <FormAcknowledgementRow
-              label="I have read and signed the HarvestLinx Membership Enrollment & Disclosure Form."
+              label="I have read and signed the HarvestLinx Membership Enrollment & Disclosure Form (includes your application details)."
               acknowledged={Boolean(enrollmentAck)}
               signedName={enrollmentAck?.signedName}
               signedDate={enrollmentAck?.signedDate}
@@ -279,10 +221,14 @@ export function JoinForm() {
             </button>
           </div>
 
-          <OtherMembershipNote className="mt-6 rounded-xl border border-gold/15 bg-cream/30 p-4" />
+          <OtherMembershipNote className="mt-6 rounded-xl border border-gold/15 bg-cream/30 p-4 text-center" />
 
-          <button type="button" onClick={() => setStep(2)} className="mt-6 text-sm font-medium text-soil/60 hover:text-soil">
-            ← Back to your information
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            className="mt-6 text-sm font-medium text-soil/60 hover:text-soil"
+          >
+            ← Back
           </button>
         </div>
       )}
@@ -290,7 +236,8 @@ export function JoinForm() {
       {openDisclaimer && (
         <AcknowledgementModal
           disclaimer={MEMBERSHIP_DISCLAIMERS[openDisclaimer]}
-          defaultName={form.getValues("fullName")}
+          collectApplicationInfo={openDisclaimer === "enrollmentDisclosure"}
+          defaultName={enrollmentAck?.signedName ?? complianceAck?.signedName}
           existingAcknowledgement={
             openDisclaimer === "compliance" ? complianceAck : enrollmentAck
           }
@@ -300,29 +247,6 @@ export function JoinForm() {
           }
         />
       )}
-    </div>
-  );
-}
-
-const inputClass =
-  "w-full rounded-xl border border-gold/25 bg-white px-4 py-3 text-soil outline-none ring-green focus:ring-2";
-
-function Field({
-  label,
-  error,
-  children,
-  className = "",
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={className}>
-      <label className="mb-1.5 block text-sm font-medium text-soil">{label}</label>
-      {children}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );
 }

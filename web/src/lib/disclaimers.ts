@@ -73,7 +73,7 @@ export const MEMBERSHIP_DISCLAIMERS: Record<DisclaimerId, DisclaimerDefinition> 
       {
         heading: "Section 1 — Membership Application",
         body: [
-          "This section collects information necessary to apply for membership in HarvestLinx Cooperative. The standard membership joining fee is USD 100.",
+          "This section collects your application information for membership in HarvestLinx Cooperative, including your name, email, phone, and address. The standard membership joining fee is USD 100.",
         ],
       },
       {

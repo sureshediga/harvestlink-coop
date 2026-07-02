@@ -8,17 +8,7 @@ export const formAcknowledgementSchema = z.object({
 
 export type FormAcknowledgement = z.infer<typeof formAcknowledgementSchema>;
 
-export const membershipAcknowledgementsSchema = z.object({
-  compliance: formAcknowledgementSchema,
-  enrollmentDisclosure: formAcknowledgementSchema,
-});
-
-export type MembershipAcknowledgements = z.infer<
-  typeof membershipAcknowledgementsSchema
->;
-
-export const memberInfoSchema = z.object({
-  fullName: z.string().min(2, "Full name is required"),
+const contactFieldsSchema = {
   email: z.string().email("Valid email is required"),
   phone: z
     .string()
@@ -28,11 +18,33 @@ export const memberInfoSchema = z.object({
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
   zip: z.string().regex(/^\d{5}(-\d{4})?$/, "Valid ZIP code is required"),
+};
+
+export const enrollmentAcknowledgementSchema = formAcknowledgementSchema.extend(
+  contactFieldsSchema
+);
+
+export type EnrollmentAcknowledgement = z.infer<
+  typeof enrollmentAcknowledgementSchema
+>;
+
+export const membershipAcknowledgementsSchema = z.object({
+  compliance: formAcknowledgementSchema,
+  enrollmentDisclosure: enrollmentAcknowledgementSchema,
+});
+
+export type MembershipAcknowledgements = z.infer<
+  typeof membershipAcknowledgementsSchema
+>;
+
+export const memberInfoSchema = z.object({
+  fullName: z.string().min(2, "Full name is required"),
+  ...contactFieldsSchema,
 });
 
 export type MemberInfo = z.infer<typeof memberInfoSchema>;
 
-export const membershipCheckoutSchema = memberInfoSchema.extend({
+export const membershipCheckoutSchema = z.object({
   agreedToTerms: z.literal(true, {
     message: "You must agree to membership terms",
   }),
@@ -49,6 +61,21 @@ export const investmentCheckoutSchema = memberInfoSchema.extend({
 
 export type MembershipCheckoutPayload = z.infer<typeof membershipCheckoutSchema>;
 export type InvestmentCheckoutPayload = z.infer<typeof investmentCheckoutSchema>;
+
+export function memberInfoFromMembershipCheckout(
+  data: MembershipCheckoutPayload
+): MemberInfo {
+  const enrollment = data.acknowledgements.enrollmentDisclosure;
+  return {
+    fullName: enrollment.signedName,
+    email: enrollment.email,
+    phone: enrollment.phone,
+    street: enrollment.street,
+    city: enrollment.city,
+    state: enrollment.state,
+    zip: enrollment.zip,
+  };
+}
 
 // Backward-compatible alias
 export const checkoutSchema = membershipCheckoutSchema;

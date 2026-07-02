@@ -16,14 +16,15 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
+    const { enrollmentDisclosure } = data.acknowledgements;
     const application = await createApplication({
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      street: data.street,
-      city: data.city,
-      state: data.state,
-      zip: data.zip,
+      fullName: enrollmentDisclosure.signedName,
+      email: enrollmentDisclosure.email,
+      phone: enrollmentDisclosure.phone,
+      street: enrollmentDisclosure.street,
+      city: enrollmentDisclosure.city,
+      state: enrollmentDisclosure.state,
+      zip: enrollmentDisclosure.zip,
       kind: "membership",
       acknowledgements: data.acknowledgements,
     });

@@ -4,4 +4,4 @@ export const MANUAL_PAYMENT = {
     "Include your application reference number in the Zelle memo.",
 } as const;
 
-export const OTHER_MEMBERSHIP_OPPORTUNITIES_NOTE = `For other membership and investment opportunities, please call ${MANUAL_PAYMENT.zellePhone}.`;
+export const OTHER_INVESTMENT_OPPORTUNITIES_NOTE = `For other investment opportunities, please call ${MANUAL_PAYMENT.zellePhone}.`;

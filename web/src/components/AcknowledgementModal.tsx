@@ -5,33 +5,60 @@ import {
   disclaimerDocumentUrl,
   type DisclaimerDefinition,
 } from "@/lib/disclaimers";
-import type { FormAcknowledgement } from "@/lib/schemas";
+import type {
+  EnrollmentAcknowledgement,
+  FormAcknowledgement,
+} from "@/lib/schemas";
 
 type AcknowledgementModalProps = {
   disclaimer: DisclaimerDefinition;
+  collectApplicationInfo?: boolean;
   defaultName?: string;
-  existingAcknowledgement?: FormAcknowledgement | null;
+  existingAcknowledgement?: FormAcknowledgement | EnrollmentAcknowledgement | null;
   onClose: () => void;
-  onAcknowledge: (acknowledgement: FormAcknowledgement) => void;
+  onAcknowledge: (
+    acknowledgement: FormAcknowledgement | EnrollmentAcknowledgement
+  ) => void;
 };
+
+const inputClass =
+  "w-full rounded-xl border border-gold/25 bg-white px-4 py-3 text-soil outline-none ring-green focus:ring-2";
 
 function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+function isEnrollmentAcknowledgement(
+  value: FormAcknowledgement | EnrollmentAcknowledgement
+): value is EnrollmentAcknowledgement {
+  return "email" in value;
+}
+
 export function AcknowledgementModal({
   disclaimer,
+  collectApplicationInfo = false,
   defaultName = "",
   existingAcknowledgement,
   onClose,
   onAcknowledge,
 }: AcknowledgementModalProps) {
+  const existingEnrollment =
+    existingAcknowledgement && isEnrollmentAcknowledgement(existingAcknowledgement)
+      ? existingAcknowledgement
+      : null;
+
   const [signedName, setSignedName] = useState(
     existingAcknowledgement?.signedName ?? defaultName
   );
   const [signedDate, setSignedDate] = useState(
     existingAcknowledgement?.signedDate ?? todayIsoDate()
   );
+  const [email, setEmail] = useState(existingEnrollment?.email ?? "");
+  const [phone, setPhone] = useState(existingEnrollment?.phone ?? "");
+  const [street, setStreet] = useState(existingEnrollment?.street ?? "");
+  const [city, setCity] = useState(existingEnrollment?.city ?? "");
+  const [state, setState] = useState(existingEnrollment?.state ?? "");
+  const [zip, setZip] = useState(existingEnrollment?.zip ?? "");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -60,6 +87,53 @@ export function AcknowledgementModal({
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(signedDate)) {
       setError("Please enter a valid date.");
+      return;
+    }
+
+    if (collectApplicationInfo) {
+      const trimmedEmail = email.trim();
+      const trimmedPhone = phone.trim();
+      const trimmedStreet = street.trim();
+      const trimmedCity = city.trim();
+      const trimmedState = state.trim();
+      const trimmedZip = zip.trim();
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+        setError("Please enter a valid email address.");
+        return;
+      }
+      if (trimmedPhone.length < 10 || !/^[\d\s\-+()]+$/.test(trimmedPhone)) {
+        setError("Please enter a valid phone number.");
+        return;
+      }
+      if (trimmedStreet.length < 3) {
+        setError("Please enter your street address.");
+        return;
+      }
+      if (trimmedCity.length < 2) {
+        setError("Please enter your city.");
+        return;
+      }
+      if (trimmedState.length < 2) {
+        setError("Please enter your state.");
+        return;
+      }
+      if (!/^\d{5}(-\d{4})?$/.test(trimmedZip)) {
+        setError("Please enter a valid ZIP code.");
+        return;
+      }
+
+      onAcknowledge({
+        signedName: trimmedName,
+        signedDate,
+        acknowledgedAt: new Date().toISOString(),
+        email: trimmedEmail,
+        phone: trimmedPhone,
+        street: trimmedStreet,
+        city: trimmedCity,
+        state: trimmedState,
+        zip: trimmedZip,
+      });
       return;
     }
 
@@ -92,7 +166,9 @@ export function AcknowledgementModal({
                 {disclaimer.title}
               </h2>
               <p className="mt-1 text-sm text-soil/60">
-                Read the form below, then sign with your printed name and date.
+                {collectApplicationInfo
+                  ? "Read the form below, enter your details, and sign with your printed name and date."
+                  : "Read the form below, then sign with your printed name and date."}
               </p>
             </div>
             <button
@@ -142,21 +218,128 @@ export function AcknowledgementModal({
           onSubmit={handleSubmit}
           className="border-t border-gold/15 bg-cream/30 px-6 py-4"
         >
+          {collectApplicationInfo && (
+            <div className="mb-4 grid gap-4 sm:grid-cols-2">
+              <label className="block sm:col-span-2">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  Full name
+                </span>
+                <input
+                  value={signedName}
+                  onChange={(event) => {
+                    setSignedName(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="name"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  Email
+                </span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="email"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  Phone
+                </span>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(event) => {
+                    setPhone(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="tel"
+                />
+              </label>
+              <label className="block sm:col-span-2">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  Street address
+                </span>
+                <input
+                  value={street}
+                  onChange={(event) => {
+                    setStreet(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="street-address"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  City
+                </span>
+                <input
+                  value={city}
+                  onChange={(event) => {
+                    setCity(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="address-level2"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  State
+                </span>
+                <input
+                  value={state}
+                  onChange={(event) => {
+                    setState(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="address-level1"
+                />
+              </label>
+              <label className="block sm:col-span-2">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  ZIP code
+                </span>
+                <input
+                  value={zip}
+                  onChange={(event) => {
+                    setZip(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="postal-code"
+                />
+              </label>
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block sm:col-span-2">
-              <span className="mb-1.5 block text-sm font-medium text-soil">
-                Printed name
-              </span>
-              <input
-                value={signedName}
-                onChange={(event) => {
-                  setSignedName(event.target.value);
-                  setError(null);
-                }}
-                className="w-full rounded-xl border border-gold/25 bg-white px-4 py-3 text-soil outline-none ring-green focus:ring-2"
-                autoComplete="name"
-              />
-            </label>
+            {!collectApplicationInfo && (
+              <label className="block sm:col-span-2">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  Printed name
+                </span>
+                <input
+                  value={signedName}
+                  onChange={(event) => {
+                    setSignedName(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="name"
+                />
+              </label>
+            )}
             <label className="block">
               <span className="mb-1.5 block text-sm font-medium text-soil">
                 Date
@@ -168,14 +351,12 @@ export function AcknowledgementModal({
                   setSignedDate(event.target.value);
                   setError(null);
                 }}
-                className="w-full rounded-xl border border-gold/25 bg-white px-4 py-3 text-soil outline-none ring-green focus:ring-2"
+                className={inputClass}
               />
             </label>
           </div>
 
-          {error && (
-            <p className="mt-3 text-sm text-red-600">{error}</p>
-          )}
+          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
           <div className="mt-4 flex flex-wrap gap-3">
             <button

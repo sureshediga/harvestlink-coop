@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { membershipCheckoutSchema } from "@/lib/schemas";
+import { membershipCheckoutSchema, memberInfoFromMembershipCheckout } from "@/lib/schemas";
 import { createPendingCheckout } from "@/lib/pending-checkout";
 import { createPayPalOrder, isPayPalConfigured } from "@/lib/paypal";
 
@@ -23,10 +23,11 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
+    const member = memberInfoFromMembershipCheckout(data);
     const pending = await createPendingCheckout({
       kind: "membership",
       investmentUnits: 0,
-      ...data,
+      ...member,
     });
 
     const { approvalUrl } = await createPayPalOrder({

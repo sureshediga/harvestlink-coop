@@ -6,7 +6,7 @@ import { MEMBERSHIP } from "@/lib/constants";
 import { MANUAL_PAYMENT } from "@/lib/manual-payment";
 
 export const metadata = {
-  title: "Other Membership & Investment Opportunities",
+  title: "Other Investment Opportunities",
 };
 
 export default function InvestPage() {
@@ -16,13 +16,13 @@ export default function InvestPage() {
     <>
       <PageHero
         eyebrow="Contact us"
-        title="Other Membership & Investment Opportunities"
-        description={`Online signup is for the standard $${MEMBERSHIP.joiningFee} membership. For other options, please call us directly.`}
+        title="Other Investment Opportunities"
+        description={`Online signup is for the standard $${MEMBERSHIP.joiningFee} membership. For other investment options, please call us directly.`}
       />
 
       <Section>
         <div className="mx-auto max-w-xl rounded-2xl border border-gold/20 bg-white p-8 text-center shadow-sm">
-          <OtherMembershipNote className="text-base text-soil/80" />
+          <OtherMembershipNote />
           <a
             href={phoneHref}
             className="mt-6 inline-block rounded-full bg-green px-8 py-3.5 text-sm font-semibold text-white hover:bg-green/90"

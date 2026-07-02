@@ -277,7 +277,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is the difference between membership and investment?",
     answer:
-      "Online signup is for the standard USD 100 membership. For other membership and investment opportunities, please call 614-961-9552.",
+      "Online signup is for the standard USD 100 membership. For other investment opportunities, please call 614-961-9552.",
   },
   {
     question: "How does the FPO linkage work?",
@@ -302,7 +302,7 @@ export const FAQ_ITEMS = [
   {
     question: "Can I invest without being a member?",
     answer:
-      "For other membership and investment opportunities, please call 614-961-9552.",
+      "For other investment opportunities, please call 614-961-9552.",
   },
 ] as const;
 

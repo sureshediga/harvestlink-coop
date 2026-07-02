@@ -69,7 +69,7 @@ export function Footer() {
             >
               Join — ${MEMBERSHIP.joiningFee}
             </Link>
-            <OtherMembershipNote className="mt-4 text-cream/70 [&_a]:text-gold" />
+            <OtherMembershipNote variant="dark" className="mt-4" />
           </div>
         </div>
       </div>
