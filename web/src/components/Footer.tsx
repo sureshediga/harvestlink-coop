@@ -9,7 +9,7 @@ export function Footer() {
     <footer className="mt-auto border-t border-gold/20 bg-soil text-cream">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-3">
         <div>
-          <Logo className="[&_span]:text-cream" />
+          <Logo size="footer" />
           <p className="mt-4 text-sm leading-relaxed text-cream/80">
             {SITE.tagline}
           </p>

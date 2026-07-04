@@ -68,11 +68,26 @@ export function AcknowledgementModal({
       }
     }
 
-    document.body.style.overflow = "hidden";
+    const scrollY = window.scrollY;
+    const { body, documentElement } = document;
+
+    documentElement.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
-      document.body.style.overflow = "";
+      documentElement.style.overflow = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      window.scrollTo(0, scrollY);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [onClose]);
@@ -146,78 +161,79 @@ export function AcknowledgementModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-soil/50 p-4"
+      className="fixed inset-0 z-50 overflow-y-auto overscroll-y-contain bg-soil/50"
       role="dialog"
       aria-modal="true"
       aria-labelledby="acknowledgement-modal-title"
       onClick={onClose}
     >
-      <div
-        className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-gold/20 bg-white shadow-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="border-b border-gold/15 px-6 py-4">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2
-                id="acknowledgement-modal-title"
-                className="font-serif text-2xl font-semibold text-soil"
+      <div className="flex min-h-full items-end justify-center p-4 sm:items-center sm:p-6">
+        <div
+          className="w-full max-w-3xl rounded-2xl border border-gold/20 bg-white shadow-xl"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="border-b border-gold/15 px-6 py-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2
+                  id="acknowledgement-modal-title"
+                  className="font-serif text-2xl font-semibold text-soil"
+                >
+                  {disclaimer.title}
+                </h2>
+                <p className="mt-1 text-sm text-soil/60">
+                  {collectApplicationInfo
+                    ? "Read the form below, enter your details, and sign with your printed name and date."
+                    : "Read the form below, then sign with your printed name and date."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="shrink-0 rounded-full px-3 py-1 text-sm font-medium text-soil/60 hover:bg-cream hover:text-soil"
+                aria-label="Close"
               >
-                {disclaimer.title}
-              </h2>
-              <p className="mt-1 text-sm text-soil/60">
-                {collectApplicationInfo
-                  ? "Read the form below, enter your details, and sign with your printed name and date."
-                  : "Read the form below, then sign with your printed name and date."}
-              </p>
+                Close
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-full px-3 py-1 text-sm font-medium text-soil/60 hover:bg-cream hover:text-soil"
-              aria-label="Close"
+            <a
+              href={disclaimerDocumentUrl(disclaimer.documentFileName)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-block text-sm font-medium text-green hover:underline"
             >
-              Close
-            </button>
+              Download original document (.docx)
+            </a>
           </div>
-          <a
-            href={disclaimerDocumentUrl(disclaimer.documentFileName)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-block text-sm font-medium text-green hover:underline"
-          >
-            Download original document (.docx)
-          </a>
-        </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          <div className="space-y-6 text-sm leading-relaxed text-soil/80">
-            {disclaimer.sections.map((section) => (
-              <section key={section.heading}>
-                <h3 className="font-semibold text-soil">{section.heading}</h3>
+          <div className="px-6 py-5">
+            <div className="space-y-6 text-sm leading-relaxed text-soil/80">
+              {disclaimer.sections.map((section) => (
+                <section key={section.heading}>
+                  <h3 className="font-semibold text-soil">{section.heading}</h3>
+                  <div className="mt-2 space-y-2">
+                    {section.body.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
+                </section>
+              ))}
+
+              <section className="rounded-xl border border-gold/20 bg-cream/40 p-4">
+                <h3 className="font-semibold text-soil">Member Certification</h3>
                 <div className="mt-2 space-y-2">
-                  {section.body.map((paragraph) => (
+                  {disclaimer.certification.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
                   ))}
                 </div>
               </section>
-            ))}
-
-            <section className="rounded-xl border border-gold/20 bg-cream/40 p-4">
-              <h3 className="font-semibold text-soil">Member Certification</h3>
-              <div className="mt-2 space-y-2">
-                {disclaimer.certification.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
-            </section>
+            </div>
           </div>
-        </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="border-t border-gold/15 bg-cream/30 px-6 py-4"
-        >
+          <form
+            onSubmit={handleSubmit}
+            className="border-t border-gold/15 bg-cream/30 px-6 py-4"
+          >
           {collectApplicationInfo && (
             <div className="mb-4 grid gap-4 sm:grid-cols-2">
               <label className="block sm:col-span-2">
@@ -374,6 +390,7 @@ export function AcknowledgementModal({
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

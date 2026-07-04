@@ -10,22 +10,22 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-gold/20 bg-cream/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Logo showSubtitle className="shrink-0" />
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 sm:py-3">
+        <Logo className="shrink-0" />
 
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-5 lg:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-soil/80 transition hover:text-green"
+              className="font-serif text-[0.8125rem] font-medium tracking-wide text-green/85 transition hover:text-gold sm:text-sm"
             >
               {link.label}
             </Link>
           ))}
           <Link
             href="/join"
-            className="rounded-full bg-saffron px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-saffron/90"
+            className="rounded-full bg-saffron px-4 py-2 font-serif text-[0.8125rem] font-semibold tracking-wide text-white shadow-sm transition hover:bg-saffron/90 sm:text-sm"
           >
             Join — ${MEMBERSHIP.joiningFee}
           </Link>
@@ -34,7 +34,7 @@ export function Header() {
         <div className="flex items-center gap-2 lg:hidden">
           <Link
             href="/join"
-            className="rounded-full bg-saffron px-3 py-2 text-xs font-semibold text-white sm:px-4 sm:text-sm"
+            className="rounded-full bg-saffron px-3 py-2 font-serif text-xs font-semibold tracking-wide text-white sm:px-4 sm:text-sm"
           >
             Join — ${MEMBERSHIP.joiningFee}
           </Link>
@@ -60,7 +60,7 @@ export function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-2 py-2 text-sm font-medium text-soil/80 hover:bg-white"
+                className="rounded-lg px-2 py-2 font-serif text-sm font-medium tracking-wide text-green/85 hover:bg-white hover:text-gold"
               >
                 {link.label}
               </Link>

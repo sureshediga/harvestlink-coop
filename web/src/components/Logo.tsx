@@ -4,32 +4,33 @@ import Image from "next/image";
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
 
+const LOGO_WIDTH = 1235;
+const LOGO_HEIGHT = 1194;
+
 type LogoProps = {
-  showSubtitle?: boolean;
   className?: string;
+  size?: "header" | "footer";
 };
 
-export function Logo({ showSubtitle = false, className = "" }: LogoProps) {
+export function Logo({ className = "", size = "header" }: LogoProps) {
+  const heightClass =
+    size === "footer" ? "h-18 w-auto sm:h-22" : "h-10 w-auto sm:h-12";
+
   return (
-    <Link href="/" className={`flex items-center gap-3 ${className}`}>
+    <Link
+      href="/"
+      className={`block shrink-0 leading-none transition-opacity hover:opacity-90 ${className}`}
+    >
       <Image
         src="/logo.png"
         alt={`${SITE.legalName} logo`}
-        width={48}
-        height={48}
-        className="h-10 w-10 rounded-full object-cover sm:h-12 sm:w-12"
-        priority
+        width={LOGO_WIDTH}
+        height={LOGO_HEIGHT}
+        className={`block ${heightClass}`}
+        style={{ width: "auto", height: "auto" }}
+        priority={size === "header"}
+        sizes={size === "footer" ? "260px" : "(max-width: 640px) 140px, 180px"}
       />
-      <div className="leading-tight">
-        <span className="font-serif text-lg font-semibold text-soil sm:text-xl">
-          {SITE.name}
-        </span>
-        {showSubtitle && (
-          <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-green">
-            Cooperative
-          </span>
-        )}
-      </div>
     </Link>
   );
 }
