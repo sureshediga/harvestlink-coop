@@ -6,6 +6,7 @@ import { PillarCard } from "@/components/PillarCard";
 import {
   FARMER_PARTNERS,
   FRAMING_NOTE,
+  INVESTOR,
   LOGISTICS_STAGES,
   MEMBERSHIP,
   PILLARS,
@@ -22,12 +23,12 @@ export default function HomePage() {
             Opening Soon in Texas
           </span>
           <h1 className="mt-6 font-serif text-4xl font-semibold leading-tight text-soil sm:text-6xl">
-            Member-Owned. FPO-Connected. Middlemen-Free.
+            Member-Owned. Farmer-Connected. Middlemen-Free.
           </h1>
           <p className="mt-6 text-xl text-soil/75">
-            A consumer cooperative linking Indian diaspora households directly with
-            Farmer Producer Organizations in India — for safe, traceable, culturally
-            authentic food.
+            A member-owned consumer cooperative linking Indian diaspora households
+            directly with farmer-owned organisations in India — pure products,
+            better pricing, and a middlemen-free supply chain.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4">
             <Link
@@ -38,7 +39,8 @@ export default function HomePage() {
             </Link>
           </div>
           <p className="mt-4 text-sm text-soil/60">
-            ${MEMBERSHIP.joiningFee} one-time joining fee · One member, one vote
+            ${MEMBERSHIP.joiningFee} one-time joining fee · Voting rights from
+            USD {INVESTOR.minimumVotingAmount.toLocaleString()} investment
           </p>
           <OtherMembershipNote className="mx-auto mt-3 max-w-md text-center" />
         </div>

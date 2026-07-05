@@ -3,12 +3,13 @@ export const SITE = {
   legalName: "HarvestLink Cooperative",
   tagline: "Member-Owned · Farmer-Connected · Middlemen-Free",
   description:
-    "A member-owned consumer cooperative linking Indian diaspora households in the U.S. directly with Farmer Producer Organizations in India for safe, traceable, culturally authentic food.",
+    "A member-owned consumer cooperative linking Indian diaspora households in the U.S. directly with farmer-owned organisations in India — disintermediated farm-to-consumer supply for pure products at better pricing.",
   contactEmail: "hello@harvestlink.coop",
   preparedBy: "Centre for Sustainable Agriculture, Hyderabad",
   documentVersion: "Draft 1.0 — May 2026",
   membershipFee: 100,
   investmentUnit: 100,
+  minimumVotingInvestment: 1000,
 } as const;
 
 export const FRAMING_NOTE =
@@ -19,14 +20,15 @@ export const MEMBERSHIP = {
   monthlyPurchaseCommitment: 25,
   title: "Membership",
   summary:
-    "Become an owner of the cooperative with democratic governance rights and access to traceable, region-specific groceries sourced directly from FPO partners in India.",
+    "Become a member-owner with a USD 100 one-time joining fee and access to pure, traceable groceries sourced directly from farmer-owned organisations — better returns to farmers and better pricing for members through a middlemen-free supply chain.",
   benefits: [
-    "One member household, one vote — democratic governance",
-    "Elected board of directors and annual member meeting",
-    "Access to residue-tested, traceable FPO-sourced products",
-    "Target 15–25% below comparable quality ethnic retail pricing",
+    "USD 100 one-time joining fee — member-owned cooperative",
+    "Access to pure, traceable products at better pricing",
+    "Member fulfillment through cooperative retail stores (Costco model)",
+    "Local WhatsApp groups coordinate group delivery at one location on scheduled dates",
+    "Disintermediated farm-to-consumer supply chain",
     "Regional food baskets — Telangana, Tamil, North Indian, and more",
-    "QR traceability: farm, FPO, season, and test results for every lot",
+    "QR traceability: farm, cooperative, season, and test results for every lot",
     "Membership in a community institution — not just a grocery customer",
   ],
   obligations: [
@@ -35,11 +37,12 @@ export const MEMBERSHIP = {
     "Optional: 2 hours/month volunteer work for an additional 10% member discount",
   ],
   governance: [
-    "One member, one vote",
-    "Board elected by members",
+    "USD 1,000+ invested members receive voting rights — one member, one vote",
+    "Dividends proportional to capital investment",
+    "Board elected by voting members",
     "Annual public reporting of finances and residue test results",
     "Sourcing principles charter amendable only by 75% member vote",
-    "FPO advisory representation on the cooperative board",
+    "Farmer-owned organisation advisory representation on the cooperative board",
   ],
   scale: "500 member households target for Phase 1 viable procurement volumes",
   chapters:
@@ -50,25 +53,34 @@ export const MEMBERSHIP = {
 
 export const INVESTOR = {
   unitAmount: 100,
+  minimumVotingAmount: 1000,
   title: "Cooperative Capital Investment",
   summary:
-    "Members may invest additional capital in multiples of USD 100 to support cooperative growth. Dividends are proportional to investment — voting rights remain equal for all members.",
+    "Members who invest USD 1,000 or more in cooperative capital receive voting rights and dividends proportional to their investment — one member, one vote among voting members.",
   benefits: [
+    "Voting rights for members with USD 1,000+ invested capital",
     "Dividends proportional to your investment amount",
-    "Support FPO export readiness and cooperative infrastructure",
-    "Equal voting rights — investment does not affect one-member-one-vote",
+    "Support farmer-owned aggregation and cooperative export readiness",
+    "Funds cooperative retail stores, traceability platform, and logistics",
     "Transparent, community-driven capital model",
-    "Funds cooperative development including traceability platform and logistics",
   ],
   details: [
-    "Minimum investment: USD 100 (1 unit)",
-    "Invest in multiples of USD 100 — USD 100, 200, 500, or custom",
+    "Minimum USD 1,000 investment for voting rights",
+    "Dividends proportional to capital invested",
+    "One member, one vote among members with voting rights",
+    "Separate from the USD 100 membership joining fee",
     "Open to cooperative members seeking to deepen their stake",
-    "Patron capital supports Phase 1 shipments, platform, and FPO partnerships",
-    "Phase 3: Cooperative Development Fund (2% of revenue) for new FPO export readiness",
+    "Patron capital supports Phase 1 shipments, platform, and farmer-owned partnerships",
   ],
   note:
-    "Investment is optional and separate from membership. You must agree to cooperative investment terms. Membership is required before or alongside investment.",
+    "The USD 100 membership joining fee is required for all members. Capital investment of USD 1,000 or more is optional and grants voting rights. Contact us to discuss investment.",
+} as const;
+
+export const SUPPLY_CHAIN = {
+  summary:
+    "We prefer farmer-owned organisations and similar mission-oriented entrepreneurs — cooperative structures like Farmveda — over commodity middlemen. Farmer-owned organisations collect from member farmers, process, and assure pure quality.",
+  farmerReturns:
+    "Disintermediated supply chain with better returns to farmers and pure products at better pricing for members.",
 } as const;
 
 export { MANUAL_PAYMENT } from "./manual-payment";
@@ -86,28 +98,28 @@ export const PILLARS = [
     title: "Member-Owned",
     icon: "🤝",
     description:
-      "USD 100 joining fee. One member, one vote. Democratic governance with elected board and annual member meeting.",
+      "USD 100 one-time joining fee. Member-owned cooperative. Members investing USD 1,000 or more receive voting rights — one member, one vote.",
   },
   {
-    title: "FPO-Connected",
+    title: "Farmer-Connected",
     icon: "🌱",
     description:
-      "Direct institution-to-institution linkage with registered Farmer Producer Organizations — not individual middlemen.",
+      "Direct from farmer-owned organisations and mission-oriented entrepreneurs — preferring cooperative structures over commodity middlemen.",
   },
   {
     title: "Middlemen-Free",
     icon: "↔️",
     description:
-      "Disintermediated supply chain with farm-to-consumer traceability, residue testing, and fair price distribution.",
+      "Disintermediated farm-to-consumer supply chain — better returns to farmers and pure products at better pricing for members.",
   },
 ] as const;
 
 export const LOGISTICS_STAGES = [
   {
     stage: 1,
-    title: "FPO Aggregation (India)",
+    title: "Farmer-Owned Aggregation (India)",
     description:
-      "FPO collects from member farmers, processes, tests quality, and packs with QR-coded lot traceability.",
+      "Farmer-owned organisations collect from member farmers, process, test quality, and pack with QR-coded lot traceability.",
   },
   {
     stage: 2,
@@ -125,7 +137,7 @@ export const LOGISTICS_STAGES = [
     stage: 4,
     title: "Member Fulfillment",
     description:
-      "Members pre-order quarterly regional baskets — shipped from NJ, CA, and TX hubs or collected locally.",
+      "Membership retail stores (Costco model). Local WhatsApp groups coordinate group delivery at one location on scheduled dates.",
   },
 ] as const;
 
@@ -224,12 +236,12 @@ export const FARMER_PARTNERS = [
 ] as const;
 
 export const GOVERNANCE_SAFEGUARDS = [
-  "FPO advisory board seats for partner institution representatives",
-  "Sourcing principles in articles — FPO-only procurement, residue testing, fair price floors",
+  "Farmer-owned organisation advisory board seats for partner institution representatives",
+  "Sourcing principles in articles — farmer-owned procurement, residue testing, fair price floors",
   "75% member vote required to amend sourcing principles",
   "Annual public financial and residue test reporting",
   "Conflict of interest policy for board members in food import/export",
-  "Multi-year FPO supply agreements (3–5 year rolling contracts)",
+  "Multi-year supply agreements (3–5 year rolling contracts) with farmer-owned partners",
 ] as const;
 
 export const ROADMAP = [
@@ -272,17 +284,17 @@ export const FAQ_ITEMS = [
   {
     question: "What does membership cost and include?",
     answer:
-      "Membership requires a USD 100 one-time joining fee and a USD 25/month minimum purchase commitment once products are available. You become an owner with one member, one vote, access to traceable FPO products, regional baskets, and democratic governance.",
+      "Membership requires a USD 100 one-time joining fee and a USD 25/month minimum purchase commitment once products are available. You become a member-owner with access to pure, traceable products, cooperative retail fulfillment (Costco model), and local WhatsApp group delivery. Voting rights require a separate minimum USD 1,000 capital investment.",
   },
   {
     question: "What is the difference between membership and investment?",
     answer:
-      "Online signup is for the standard USD 100 membership. For other investment opportunities, please call 614-961-9552.",
+      "Membership is USD 100 one-time online — it gives you access to member pricing, products, and fulfillment. Investment of USD 1,000 or more is separate patron capital that grants voting rights and dividends proportional to your investment. For investment opportunities, please call 614-961-9552.",
   },
   {
-    question: "How does the FPO linkage work?",
+    question: "How does the farmer-owned supply chain work?",
     answer:
-      "We source exclusively from registered FPOs — not individual farmers or commodity traders. FPOs aggregate supply, enforce quality standards, handle export documentation, and provide institutional accountability.",
+      "We source from farmer-owned organisations and mission-oriented entrepreneurs — preferring cooperative structures over commodity middlemen. These organisations collect from member farmers, process, and assure pure quality. The result is a disintermediated farm-to-consumer supply chain with better returns to farmers and better pricing for members.",
   },
   {
     question: "When will the Texas store open?",
@@ -297,15 +309,15 @@ export const FAQ_ITEMS = [
   {
     question: "How does voting work?",
     answer:
-      "Every member household gets one vote, regardless of investment amount. Members elect the board and vote on cooperative governance including sourcing principles.",
+      "Members who invest USD 1,000 or more in cooperative capital receive voting rights — one member, one vote among voting members. Dividends are proportional to capital invested. The USD 100 membership fee alone does not confer voting rights.",
   },
   {
     question: "Can I invest without being a member?",
     answer:
-      "For other investment opportunities, please call 614-961-9552.",
+      "Membership is required. The USD 100 joining fee makes you a member; USD 1,000 or more in patron capital grants voting rights and proportional dividends. Call 614-961-9552 to discuss investment.",
   },
 ] as const;
 
-export const MEMBERSHIP_TERMS = `By joining HarvestLink Cooperative, I acknowledge the USD 100 one-time joining fee and USD 25/month minimum purchase commitment once products are available. I understand that membership grants one equal vote per household in cooperative governance, that the board is elected by members, and that I am applying for membership — not an investment contract. I agree to the cooperative principles of democratic member control, FPO-only sourcing, and community ownership.`;
+export const MEMBERSHIP_TERMS = `By joining HarvestLink Cooperative, I acknowledge the USD 100 one-time joining fee and USD 25/month minimum purchase commitment once products are available. I understand that the USD 100 membership fee grants member access and benefits but does not confer voting rights — voting rights require a minimum USD 1,000 cooperative capital investment (one member, one vote among voting members). I am applying for membership — not an investment contract. I agree to the cooperative principles of member ownership, farmer-connected sourcing, and community ownership.`;
 
-export const INVESTMENT_TERMS = `By investing in HarvestLink Cooperative, I acknowledge this is patron capital in multiples of USD 100, separate from my membership fee. I understand dividends may be proportional to my investment, that voting rights remain equal for all members (one member, one vote), and that investment carries cooperative business risk. I agree to the cooperative investment terms and confirm I am or will become a cooperative member.`;
+export const INVESTMENT_TERMS = `By investing in HarvestLink Cooperative, I acknowledge this is patron capital of USD 1,000 or more, separate from my USD 100 membership fee. I understand that USD 1,000+ investment grants voting rights (one member, one vote among voting members) and that dividends may be proportional to my investment. I agree to the cooperative investment terms and confirm I am or will become a cooperative member. Investment carries cooperative business risk.`;

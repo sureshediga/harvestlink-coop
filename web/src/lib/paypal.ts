@@ -88,7 +88,7 @@ export async function createPayPalOrder(input: {
       ? [
           {
             name: "HarvestLink Cooperative Membership",
-            description: "Joining fee — one member, one vote",
+            description: "USD 100 joining fee — voting rights from USD 1,000+ investment",
             unit_amount: {
               currency_code: "USD",
               value: formatAmount(membershipCents),

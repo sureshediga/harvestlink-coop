@@ -41,7 +41,7 @@ export async function POST(request: Request) {
             currency: "usd",
             product_data: {
               name: "HarvestLink Cooperative Membership",
-              description: `Joining fee — one member, one vote. USD ${MEMBERSHIP.monthlyPurchaseCommitment}/mo purchase commitment once products launch.`,
+              description: `USD ${MEMBERSHIP.joiningFee} joining fee. Voting rights from USD 1,000+ investment. USD ${MEMBERSHIP.monthlyPurchaseCommitment}/mo purchase commitment once products launch.`,
             },
             unit_amount: MEMBERSHIP.joiningFee * 100,
           },

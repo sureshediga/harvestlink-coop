@@ -7,7 +7,7 @@ import {
 } from "./AcknowledgementModal";
 import { OtherMembershipNote } from "./OtherMembershipNote";
 import { StepIndicator } from "./StepIndicator";
-import { MEMBERSHIP, MEMBERSHIP_TERMS, PILLARS } from "@/lib/constants";
+import { MEMBERSHIP, MEMBERSHIP_TERMS, PILLARS, INVESTOR } from "@/lib/constants";
 import {
   MEMBERSHIP_DISCLAIMERS,
   type DisclaimerId,
@@ -119,7 +119,8 @@ export function JoinForm() {
             </p>
             <p className="mt-1 text-sm text-soil/70">
               Plus ${MEMBERSHIP.monthlyPurchaseCommitment}/month minimum purchase
-              commitment once products launch. One member, one vote.
+              commitment once products launch. Voting rights require USD{" "}
+              {INVESTOR.minimumVotingAmount.toLocaleString()}+ investment.
             </p>
           </div>
 

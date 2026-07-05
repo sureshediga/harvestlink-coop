@@ -215,7 +215,7 @@ export function InvestForm() {
               <dd>${(totalCents / 100).toFixed(2)}</dd>
             </div>
             <div className="text-sm text-soil/60">
-              Voting: 1 member = 1 vote (unchanged). Dividends proportional to investment.
+              Voting rights for USD 1,000+ invested members — one member, one vote. Dividends proportional to investment.
             </div>
             <div className="flex justify-between border-t border-gold/20 pt-3 text-lg font-semibold text-soil">
               <dt>Due today</dt>

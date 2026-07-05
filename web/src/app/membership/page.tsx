@@ -3,7 +3,7 @@ import { CTABand } from "@/components/CTABand";
 import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { PageHero, Section } from "@/components/PageShell";
 import { WaysToPay } from "@/components/WaysToPay";
-import { GOVERNANCE_SAFEGUARDS, MEMBERSHIP } from "@/lib/constants";
+import { GOVERNANCE_SAFEGUARDS, INVESTOR, MEMBERSHIP } from "@/lib/constants";
 
 export const metadata = {
   title: "Membership",
@@ -66,6 +66,18 @@ export default function MembershipPage() {
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section title="Investment & Voting Rights" className="bg-white">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-gold/20 bg-cream/40 p-8">
+          <p className="text-sm leading-relaxed text-soil/75">{INVESTOR.summary}</p>
+          <ul className="mt-4 space-y-2 text-sm text-soil/75">
+            {INVESTOR.details.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+          <OtherMembershipNote className="mt-6" />
+        </div>
       </Section>
 
       <Section title="Governance Safeguards">

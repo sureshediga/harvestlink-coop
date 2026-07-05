@@ -5,6 +5,7 @@ import {
   FRAMING_NOTE,
   LOGISTICS_STAGES,
   MEMBER_VALUE_PROPS,
+  SUPPLY_CHAIN,
 } from "@/lib/constants";
 
 export const metadata = {
@@ -17,12 +18,15 @@ export default function HowItWorksPage() {
       <PageHero
         eyebrow="Indo-US cooperative linkage"
         title="How HarvestLink Works"
-        description="A member-governed institution on the demand side, matched with democratically governed FPO institutions on the supply side."
+        description="A member-governed institution on the demand side, matched with farmer-owned organisations on the supply side."
       />
 
       <section className="border-b border-gold/20 bg-cream/40 px-4 py-8 sm:px-6">
         <p className="mx-auto max-w-3xl text-center text-sm italic text-soil/70">
           {FRAMING_NOTE}
+        </p>
+        <p className="mx-auto mt-4 max-w-3xl text-center text-sm text-soil/70">
+          {SUPPLY_CHAIN.farmerReturns}
         </p>
       </section>
 

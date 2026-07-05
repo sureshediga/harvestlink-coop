@@ -79,7 +79,8 @@ export const MEMBERSHIP_DISCLAIMERS: Record<DisclaimerId, DisclaimerDefinition> 
       {
         heading: "Section 2 — Membership Disclosure Acknowledgement",
         body: [
-          "IMPORTANT NOTICE: Membership in HarvestLinx Cooperative is intended to allow participation in the Cooperative's activities and governance.",
+          "IMPORTANT NOTICE: Membership in HarvestLinx Cooperative is intended to allow participation in the Cooperative's activities, products, and member services.",
+          "The USD 100 membership joining fee does not confer voting rights. Voting rights require a minimum USD 1,000 cooperative capital investment — one member, one vote among voting members, with dividends proportional to investment.",
           "Membership is NOT a security or stock offering, a bank deposit, an investment contract, or a guarantee of profits or appreciation.",
           "The Cooperative does not guarantee dividends, patronage refunds, distributions, or financial returns. Any patronage distributions are subject to Board approval, Cooperative performance, and applicable law.",
           "By signing below, the applicant acknowledges understanding these disclosures.",

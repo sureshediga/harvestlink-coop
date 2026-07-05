@@ -1,4 +1,4 @@
-import { MANUAL_PAYMENT } from "@/lib/manual-payment";
+import { INVESTOR, MANUAL_PAYMENT } from "@/lib/constants";
 
 type OtherMembershipNoteProps = {
   className?: string;
@@ -20,7 +20,9 @@ export function OtherMembershipNote({
       className={`text-base leading-relaxed sm:text-lg ${toneClass} ${className}`.trim()}
     >
       <span className="inline">
-        For other investment opportunities, please call{" "}
+        Members investing USD {INVESTOR.minimumVotingAmount.toLocaleString()} or
+        more receive voting rights and dividends proportional to their
+        investment. To discuss investment, please call{" "}
         <a
           href={phoneHref}
           className="inline whitespace-nowrap font-semibold hover:underline"

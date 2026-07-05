@@ -1,7 +1,7 @@
 import { CTABand } from "@/components/CTABand";
 import { FarmerCard } from "@/components/FarmerCard";
 import { InlineCTA, PageHero, Section } from "@/components/PageShell";
-import { FARMER_PARTNERS, FPO_CRITERIA } from "@/lib/constants";
+import { FARMER_PARTNERS, FPO_CRITERIA, SUPPLY_CHAIN } from "@/lib/constants";
 
 export const metadata = {
   title: "FPO Partners",
@@ -12,8 +12,8 @@ export default function FarmersPage() {
     <>
       <PageHero
         eyebrow="Institution-to-institution"
-        title="Our FPO Partners"
-        description="HarvestLink sources exclusively from registered Farmer Producer Organizations — not individual farmers or commodity traders. FPOs aggregate supply, enforce quality, handle documentation, and provide institutional accountability."
+        title="Our Farmer-Owned Partners"
+        description={SUPPLY_CHAIN.summary}
       />
 
       <Section title="Partner Selection Criteria">

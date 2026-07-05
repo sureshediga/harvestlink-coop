@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CTABand } from "@/components/CTABand";
 import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { PageHero, Section } from "@/components/PageShell";
-import { MEMBERSHIP } from "@/lib/constants";
+import { INVESTOR, MEMBERSHIP } from "@/lib/constants";
 import { MANUAL_PAYMENT } from "@/lib/manual-payment";
 
 export const metadata = {
@@ -17,12 +17,26 @@ export default function InvestPage() {
       <PageHero
         eyebrow="Contact us"
         title="Other Investment Opportunities"
-        description={`Online signup is for the standard $${MEMBERSHIP.joiningFee} membership. For other investment options, please call us directly.`}
+        description={`Online signup is for the USD ${MEMBERSHIP.joiningFee} membership. Members who invest USD ${INVESTOR.minimumVotingAmount.toLocaleString()} or more receive voting rights and proportional dividends.`}
       />
 
       <Section>
-        <div className="mx-auto max-w-xl rounded-2xl border border-gold/20 bg-white p-8 text-center shadow-sm">
-          <OtherMembershipNote />
+        <div className="mx-auto max-w-xl rounded-2xl border border-gold/20 bg-white p-8 shadow-sm">
+          <h2 className="font-serif text-xl font-semibold text-soil">
+            {INVESTOR.title}
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-soil/75">
+            {INVESTOR.summary}
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-soil/75">
+            {INVESTOR.details.slice(0, 4).map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="text-green">✓</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <OtherMembershipNote className="mt-6 text-left" />
           <a
             href={phoneHref}
             className="mt-6 inline-block rounded-full bg-green px-8 py-3.5 text-sm font-semibold text-white hover:bg-green/90"
