@@ -20,15 +20,14 @@ export const MEMBERSHIP = {
   monthlyPurchaseCommitment: 25,
   title: "Membership",
   summary:
-    "Become a member-owner with a USD 100 one-time joining fee and access to pure, traceable groceries sourced directly from farmer-owned organisations — better returns to farmers and better pricing for members through a middlemen-free supply chain.",
+    "Become a member-owner with a USD 100 one-time joining fee and access to pure groceries sourced directly from farmer-owned organisations — better returns to farmers and better pricing for members through a middlemen-free supply chain.",
   benefits: [
     "USD 100 one-time joining fee — member-owned cooperative",
-    "Access to pure, traceable products at better pricing",
+    "Access to pure products at better pricing",
     "Member fulfillment through cooperative retail stores (Costco model)",
     "Local WhatsApp groups coordinate group delivery at one location on scheduled dates",
     "Disintermediated farm-to-consumer supply chain",
     "Regional food baskets — Telangana, Tamil, North Indian, and more",
-    "QR traceability: farm, cooperative, season, and test results for every lot",
     "Membership in a community institution — not just a grocery customer",
   ],
   obligations: [
@@ -40,7 +39,7 @@ export const MEMBERSHIP = {
     "USD 1,000+ invested members receive voting rights — one member, one vote",
     "Dividends proportional to capital investment",
     "Board elected by voting members",
-    "Annual public reporting of finances and residue test results",
+    "Annual public reporting of finances",
     "Sourcing principles charter amendable only by 75% member vote",
     "Farmer-owned organisation advisory representation on the cooperative board",
   ],
@@ -61,7 +60,7 @@ export const INVESTOR = {
     "Voting rights for members with USD 1,000+ invested capital",
     "Dividends proportional to your investment amount",
     "Support farmer-owned aggregation and cooperative export readiness",
-    "Funds cooperative retail stores, traceability platform, and logistics",
+    "Funds cooperative retail stores and logistics",
     "Transparent, community-driven capital model",
   ],
   details: [
@@ -70,7 +69,7 @@ export const INVESTOR = {
     "One member, one vote among members with voting rights",
     "Separate from the USD 100 membership joining fee",
     "Open to cooperative members seeking to deepen their stake",
-    "Patron capital supports Phase 1 shipments, platform, and farmer-owned partnerships",
+    "Patron capital supports Phase 1 shipments and farmer-owned partnerships",
   ],
   note:
     "The USD 100 membership joining fee is required for all members. Capital investment of USD 1,000 or more is optional and grants voting rights. Contact us to discuss investment.",
@@ -119,7 +118,7 @@ export const LOGISTICS_STAGES = [
     stage: 1,
     title: "Farmer-Owned Aggregation (India)",
     description:
-      "Farmer-owned organisations collect from member farmers, process, test quality, and pack with QR-coded lot traceability.",
+      "Farmer-owned organisations collect from member farmers, process, and pack for export.",
   },
   {
     stage: 2,
@@ -131,7 +130,7 @@ export const LOGISTICS_STAGES = [
     stage: 3,
     title: "US Import & Warehousing",
     description:
-      "FDA-registered import broker clears customs, conducts entry testing, and warehouses at regional hubs.",
+      "FDA-registered import broker clears customs and warehouses at regional hubs.",
   },
   {
     stage: 4,
@@ -146,17 +145,17 @@ export const FPO_CRITERIA = [
   "Minimum two years of active trading with documented accounts",
   "PGS-India, NPOP organic, or verified natural farming protocols",
   "Institutional bank account, GST registration, and IEC (Import Export Code)",
-  "Willingness for residue testing and farm-level traceability data",
+  "Commitment to quality standards and transparent sourcing practices",
 ] as const;
 
 export const MEMBER_VALUE_PROPS = [
   {
-    title: "Food safety",
-    text: "Residue-tested products with publicly available test results — not certification alone.",
+    title: "Pure products",
+    text: "Farmer-owned organisations collect, process, and assure quality through direct aggregation.",
   },
   {
-    title: "Traceability",
-    text: "Named FPO, district, farmer count, and harvest season — not just 'Product of India.'",
+    title: "Direct sourcing",
+    text: "Products from named farmer-owned partners — not anonymous commodity supply chains.",
   },
   {
     title: "Cultural authenticity",
@@ -177,7 +176,7 @@ export const PRODUCT_LINES = [
     name: "Cold-pressed groundnut oil",
     region: "Telangana / Andhra Pradesh",
     price: "$12–18 per litre",
-    note: "Chemical-free, wood-pressed, traceable",
+    note: "Chemical-free, wood-pressed",
   },
   {
     name: "Native millets",
@@ -189,19 +188,19 @@ export const PRODUCT_LINES = [
     name: "GI-tagged spices",
     region: "AP / Karnataka",
     price: "$15–30 per kg",
-    note: "GI certified, residue tested",
+    note: "GI certified",
   },
   {
     name: "Wild forest honey",
     region: "Odisha / Chhattisgarh tribal FPOs",
     price: "$20–35 per kg",
-    note: "Single-origin, lab certified",
+    note: "Single-origin",
   },
   {
     name: "Turmeric (Lakadong / native)",
     region: "Meghalaya / Telangana",
     price: "$8–15 per kg",
-    note: "High curcumin, documented",
+    note: "High curcumin, native varieties",
   },
   {
     name: "Traditional rice varieties",
@@ -237,9 +236,9 @@ export const FARMER_PARTNERS = [
 
 export const GOVERNANCE_SAFEGUARDS = [
   "Farmer-owned organisation advisory board seats for partner institution representatives",
-  "Sourcing principles in articles — farmer-owned procurement, residue testing, fair price floors",
+  "Sourcing principles in articles — farmer-owned procurement, fair price floors, quality standards",
   "75% member vote required to amend sourcing principles",
-  "Annual public financial and residue test reporting",
+  "Annual public financial reporting",
   "Conflict of interest policy for board members in food import/export",
   "Multi-year supply agreements (3–5 year rolling contracts) with farmer-owned partners",
 ] as const;
@@ -251,7 +250,7 @@ export const ROADMAP = [
     items: [
       "Incorporate cooperative and recruit 100 charter members",
       "Identify 5–8 FPO partners across 3–4 Indian states",
-      "First pilot shipment and traceability platform MVP",
+      "First pilot shipment to member chapters",
       "Target 500 active member households",
     ],
   },
@@ -279,12 +278,12 @@ export const FAQ_ITEMS = [
   {
     question: "What is HarvestLink Cooperative?",
     answer:
-      "HarvestLink is a member-owned consumer cooperative registered in Ohio, linking Indian diaspora households in the U.S. directly with Farmer Producer Organizations in India. We source safe, traceable, culturally authentic food without commodity middlemen.",
+      "HarvestLink is a member-owned consumer cooperative registered in Ohio, linking Indian diaspora households in the U.S. directly with Farmer Producer Organizations in India. We source safe, culturally authentic food without commodity middlemen.",
   },
   {
     question: "What does membership cost and include?",
     answer:
-      "Membership requires a USD 100 one-time joining fee and a USD 25/month minimum purchase commitment once products are available. You become a member-owner with access to pure, traceable products, cooperative retail fulfillment (Costco model), and local WhatsApp group delivery. Voting rights require a separate minimum USD 1,000 capital investment.",
+      "Membership requires a USD 100 one-time joining fee and a USD 25/month minimum purchase commitment once products are available. You become a member-owner with access to pure products, cooperative retail fulfillment (Costco model), and local WhatsApp group delivery. Voting rights require a separate minimum USD 1,000 capital investment.",
   },
   {
     question: "What is the difference between membership and investment?",
