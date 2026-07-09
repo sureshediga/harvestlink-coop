@@ -1,6 +1,8 @@
+import { SITE } from "./constants";
+
 export function publicApiErrorMessage(error: unknown): string {
   if (!(error instanceof Error)) {
-    return "Unable to submit application. Please try again or email hello@harvestlink.coop.";
+    return `Unable to submit application. Please try again or email ${SITE.contactEmail}.`;
   }
 
   const message = error.message;
@@ -15,5 +17,5 @@ export function publicApiErrorMessage(error: unknown): string {
     return message;
   }
 
-  return "Unable to submit application. Please try again or email hello@harvestlink.coop.";
+  return `Unable to submit application. Please try again or email ${SITE.contactEmail}.`;
 }
