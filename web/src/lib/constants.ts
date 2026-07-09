@@ -33,7 +33,7 @@ export const MEMBERSHIP = {
   obligations: [
     "USD 100 one-time joining fee",
     "USD 25/month minimum purchase commitment once products are available",
-    "Optional: 2 hours/month volunteer work for an additional 10% member discount",
+    "Optional: 2 hours/month volunteer work",
   ],
   governance: [
     "USD 1,000+ invested members receive voting rights — one member, one vote",
@@ -141,11 +141,8 @@ export const LOGISTICS_STAGES = [
 ] as const;
 
 export const FPO_CRITERIA = [
-  "Registered FPC under Companies Act or multi-state cooperative with 500+ farmer-members",
-  "Minimum two years of active trading with documented accounts",
-  "PGS-India, NPOP organic, or verified natural farming protocols",
+  "Registered FPC under Companies Act",
   "Institutional bank account, GST registration, and IEC (Import Export Code)",
-  "Commitment to quality standards and transparent sourcing practices",
 ] as const;
 
 export const MEMBER_VALUE_PROPS = [
@@ -155,7 +152,7 @@ export const MEMBER_VALUE_PROPS = [
   },
   {
     title: "Direct sourcing",
-    text: "Products from named farmer-owned partners — not anonymous commodity supply chains.",
+    text: "Focus on products from farmer-owned organisations and similar mission-oriented entrepreneurs.",
   },
   {
     title: "Cultural authenticity",
@@ -163,7 +160,7 @@ export const MEMBER_VALUE_PROPS = [
   },
   {
     title: "Price advantage",
-    text: "Member ownership eliminates commercial profit extraction — target 15–25% below comparable retail.",
+    text: "Target minimum 15% below comparable retail.",
   },
   {
     title: "Identity & meaning",
