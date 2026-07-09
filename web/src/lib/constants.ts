@@ -17,7 +17,6 @@ export const FRAMING_NOTE =
 
 export const MEMBERSHIP = {
   joiningFee: 100,
-  monthlyPurchaseCommitment: 25,
   title: "Membership",
   summary:
     "Become a member-owner with a USD 100 one-time joining fee and access to pure groceries sourced directly from farmer-owned organisations — better returns to farmers and better pricing for members through a middlemen-free supply chain.",
@@ -30,11 +29,7 @@ export const MEMBERSHIP = {
     "Regional food baskets — Telangana, Tamil, North Indian, and more",
     "Membership in a community institution — not just a grocery customer",
   ],
-  obligations: [
-    "USD 100 one-time joining fee",
-    "USD 25/month minimum purchase commitment once products are available",
-    "Optional: 2 hours/month volunteer work",
-  ],
+  obligations: ["USD 100 one-time joining fee"],
   governance: [
     "USD 1,000+ invested members receive voting rights — one member, one vote",
     "Dividends proportional to capital investment",
@@ -280,7 +275,7 @@ export const FAQ_ITEMS = [
   {
     question: "What does membership cost and include?",
     answer:
-      "Membership requires a USD 100 one-time joining fee and a USD 25/month minimum purchase commitment once products are available. You become a member-owner with access to pure products, cooperative retail fulfillment (Costco model), and local WhatsApp group delivery. Voting rights require a separate minimum USD 1,000 capital investment.",
+      "Membership requires a USD 100 one-time joining fee. You become a member-owner with access to pure products, cooperative retail fulfillment (Costco model), and local WhatsApp group delivery. Voting rights require a separate minimum USD 1,000 capital investment.",
   },
   {
     question: "What is the difference between membership and investment?",
@@ -314,6 +309,6 @@ export const FAQ_ITEMS = [
   },
 ] as const;
 
-export const MEMBERSHIP_TERMS = `By joining HarvestLink Cooperative, I acknowledge the USD 100 one-time joining fee and USD 25/month minimum purchase commitment once products are available. I understand that the USD 100 membership fee grants member access and benefits but does not confer voting rights — voting rights require a minimum USD 1,000 cooperative capital investment (one member, one vote among voting members). I am applying for membership — not an investment contract. I agree to the cooperative principles of member ownership, farmer-connected sourcing, and community ownership.`;
+export const MEMBERSHIP_TERMS = `By joining HarvestLink Cooperative, I acknowledge the USD 100 one-time joining fee. I understand that the USD 100 membership fee grants member access and benefits but does not confer voting rights — voting rights require a minimum USD 1,000 cooperative capital investment (one member, one vote among voting members). I am applying for membership — not an investment contract. I agree to the cooperative principles of member ownership, farmer-connected sourcing, and community ownership.`;
 
 export const INVESTMENT_TERMS = `By investing in HarvestLink Cooperative, I acknowledge this is patron capital of USD 1,000 or more, separate from my USD 100 membership fee. I understand that USD 1,000+ investment grants voting rights (one member, one vote among voting members) and that dividends may be proportional to my investment. I agree to the cooperative investment terms and confirm I am or will become a cooperative member. Investment carries cooperative business risk.`;

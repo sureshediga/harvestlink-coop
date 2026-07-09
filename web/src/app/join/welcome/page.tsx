@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { FoundingMemberBadge } from "@/components/FoundingMemberBadge";
 import { OtherMembershipNote } from "@/components/OtherMembershipNote";
-import { MEMBERSHIP } from "@/lib/constants";
 import {
   getMemberByPayPalOrderId,
   getMemberBySessionId,
@@ -93,10 +92,6 @@ export default async function WelcomePage({
             <dd>${totalPaid.toFixed(2)}</dd>
           </div>
         </dl>
-        <p className="mt-4 text-xs text-soil/60">
-          ${MEMBERSHIP.monthlyPurchaseCommitment}/month minimum purchase commitment applies once
-          products launch.
-        </p>
       </div>
 
       <div className="mt-8 rounded-2xl bg-green/10 p-6 text-left">
