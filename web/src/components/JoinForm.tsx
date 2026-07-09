@@ -118,9 +118,8 @@ export function JoinForm() {
               Joining fee — ${MEMBERSHIP.joiningFee}
             </p>
             <p className="mt-1 text-sm text-soil/70">
-              Plus ${MEMBERSHIP.monthlyPurchaseCommitment}/month minimum purchase
-              commitment once products launch. Voting rights require USD{" "}
-              {INVESTOR.minimumVotingAmount.toLocaleString()}+ investment.
+              Voting rights require USD {INVESTOR.minimumVotingAmount.toLocaleString()}+
+              investment.
             </p>
           </div>
 
@@ -155,10 +154,6 @@ export function JoinForm() {
             <div className="flex justify-between text-soil">
               <dt>Cooperative membership (joining fee)</dt>
               <dd>${MEMBERSHIP.joiningFee.toFixed(2)}</dd>
-            </div>
-            <div className="flex justify-between text-sm text-soil/60">
-              <dt>Ongoing commitment (once products launch)</dt>
-              <dd>${MEMBERSHIP.monthlyPurchaseCommitment}/month min.</dd>
             </div>
             <div className="flex justify-between border-t border-gold/20 pt-3 text-lg font-semibold text-soil">
               <dt>Due today</dt>
