@@ -4,7 +4,7 @@ export const SITE = {
   tagline: "Member-Owned · Farmer-Connected · Middlemen-Free",
   description:
     "A member-owned consumer cooperative linking Indian diaspora households in the U.S. directly with farmer-owned organisations in India — disintermediated farm-to-consumer supply for pure products at better pricing.",
-  contactEmail: "hello@harvestlink.coop",
+  contactEmail: "harvestlinx@gmail.com",
   preparedBy: "Centre for Sustainable Agriculture, Hyderabad",
   documentVersion: "Draft 1.0 — May 2026",
   membershipFee: 100,
