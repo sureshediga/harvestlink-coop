@@ -108,9 +108,20 @@ export async function createApplication(
   const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
 
   if (supabase) {
-    const { error } = await supabase.from("applications").insert(mapToDb(application));
+    const payload = mapToDb(application);
+    const { error } = await supabase.from("applications").insert(payload);
 
     if (error) {
+      const missingAcknowledgements =
+        /acknowledgements/i.test(error.message) ||
+        /Could not find the ['"]acknowledgements['"] column/i.test(error.message);
+
+      if (missingAcknowledgements) {
+        throw new Error(
+          "Database is missing the acknowledgements column. In the Supabase SQL editor, run web/supabase/migration-acknowledgements.sql, then try again."
+        );
+      }
+
       throw new Error(error.message);
     }
 
