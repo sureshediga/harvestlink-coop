@@ -1,11 +1,34 @@
 import { getStore } from "@netlify/blobs";
 import { isProductionHosting } from "./supabase";
 
+function errorText(error: unknown): string {
+  if (error instanceof Error) {
+    const cause =
+      error.cause instanceof Error
+        ? error.cause.message
+        : typeof error.cause === "string"
+          ? error.cause
+          : "";
+    return `${error.message}\n${cause}`;
+  }
+
+  if (error && typeof error === "object") {
+    const record = error as {
+      message?: unknown;
+      details?: unknown;
+      hint?: unknown;
+      code?: unknown;
+    };
+    return [record.message, record.details, record.hint, record.code]
+      .filter((part) => typeof part === "string" && part.length > 0)
+      .join("\n");
+  }
+
+  return String(error);
+}
+
 export function isStorageUnreachable(error: unknown): boolean {
-  const message =
-    error instanceof Error
-      ? `${error.message}\n${error.cause instanceof Error ? error.cause.message : ""}`
-      : String(error);
+  const message = errorText(error);
 
   return (
     /ENOTFOUND/i.test(message) ||
