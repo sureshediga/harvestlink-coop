@@ -1,11 +1,17 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import {
+  isStorageUnreachable,
+  readBlobJson,
+  writeBlobJson,
+} from "./blob-store";
 import type { CreateMemberInput, MemberRecord } from "./members-types";
-import { getSupabase, isProductionHosting, requireSupabase } from "./supabase";
+import { getSupabase, isProductionHosting } from "./supabase";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "members.json");
+const BLOB_KEY = "members";
 
 async function readLocalMembers(): Promise<MemberRecord[]> {
   try {
@@ -21,6 +27,21 @@ async function writeLocalMembers(members: MemberRecord[]): Promise<void> {
   await fs.writeFile(DATA_FILE, JSON.stringify(members, null, 2));
 }
 
+async function readFallbackMembers(): Promise<MemberRecord[]> {
+  if (isProductionHosting()) {
+    return readBlobJson<MemberRecord[]>(BLOB_KEY, []);
+  }
+  return readLocalMembers();
+}
+
+async function writeFallbackMembers(members: MemberRecord[]): Promise<void> {
+  if (isProductionHosting()) {
+    await writeBlobJson(BLOB_KEY, members);
+    return;
+  }
+  await writeLocalMembers(members);
+}
+
 async function generateMemberNumber(): Promise<string> {
   const year = new Date().getFullYear();
   const members = await listMembers();
@@ -29,67 +50,99 @@ async function generateMemberNumber(): Promise<string> {
 }
 
 export async function listMembers(): Promise<MemberRecord[]> {
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const { data, error } = await supabase
-      .from("members")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("members")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) {
+        if (isStorageUnreachable(error)) {
+          console.error("Supabase unreachable; using fallback storage:", error);
+          return readFallbackMembers();
+        }
+        throw new Error(error.message);
+      }
+
+      return (data ?? []).map(mapFromDb);
+    } catch (error) {
+      if (isStorageUnreachable(error)) {
+        console.error("Supabase unreachable; using fallback storage:", error);
+        return readFallbackMembers();
+      }
+      throw error instanceof Error ? error : new Error(String(error));
     }
-
-    return (data ?? []).map(mapFromDb);
   }
 
-  return readLocalMembers();
+  return readFallbackMembers();
 }
 
 export async function getMemberBySessionId(
   sessionId: string
 ): Promise<MemberRecord | null> {
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const { data, error } = await supabase
-      .from("members")
-      .select("*")
-      .eq("stripe_session_id", sessionId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("members")
+        .select("*")
+        .eq("stripe_session_id", sessionId)
+        .maybeSingle();
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) {
+        if (!isStorageUnreachable(error)) {
+          throw new Error(error.message);
+        }
+        console.error("Supabase unreachable; using fallback storage:", error);
+      } else {
+        return data ? mapFromDb(data) : null;
+      }
+    } catch (error) {
+      if (!isStorageUnreachable(error)) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+      console.error("Supabase unreachable; using fallback storage:", error);
     }
-
-    return data ? mapFromDb(data) : null;
   }
 
-  const members = await readLocalMembers();
+  const members = await readFallbackMembers();
   return members.find((m) => m.stripeSessionId === sessionId) ?? null;
 }
 
 export async function getMemberByPayPalOrderId(
   orderId: string
 ): Promise<MemberRecord | null> {
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const { data, error } = await supabase
-      .from("members")
-      .select("*")
-      .eq("paypal_order_id", orderId)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("members")
+        .select("*")
+        .eq("paypal_order_id", orderId)
+        .maybeSingle();
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) {
+        if (!isStorageUnreachable(error)) {
+          throw new Error(error.message);
+        }
+        console.error("Supabase unreachable; using fallback storage:", error);
+      } else {
+        return data ? mapFromDb(data) : null;
+      }
+    } catch (error) {
+      if (!isStorageUnreachable(error)) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+      console.error("Supabase unreachable; using fallback storage:", error);
     }
-
-    return data ? mapFromDb(data) : null;
   }
 
-  const members = await readLocalMembers();
+  const members = await readFallbackMembers();
   return members.find((m) => m.paypalOrderId === orderId) ?? null;
 }
 
@@ -117,25 +170,32 @@ export async function createMember(
     createdAt: new Date().toISOString(),
   };
 
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const { error } = await supabase.from("members").insert(mapToDb(record));
+    try {
+      const { error } = await supabase.from("members").insert(mapToDb(record));
 
-    if (error) {
-      throw new Error(error.message);
+      if (!error) {
+        return record;
+      }
+
+      if (!isStorageUnreachable(error)) {
+        throw new Error(error.message);
+      }
+
+      console.error("Supabase insert unreachable; using fallback storage:", error);
+    } catch (error) {
+      if (!isStorageUnreachable(error)) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+      console.error("Supabase insert unreachable; using fallback storage:", error);
     }
-
-    return record;
   }
 
-  if (isProductionHosting()) {
-    throw new Error("Database storage is unavailable.");
-  }
-
-  const members = await readLocalMembers();
+  const members = await readFallbackMembers();
   members.push(record);
-  await writeLocalMembers(members);
+  await writeFallbackMembers(members);
   return record;
 }
 

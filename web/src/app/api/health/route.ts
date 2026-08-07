@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isStorageUnreachable, readBlobJson } from "@/lib/blob-store";
 import { getSupabase, isProductionHosting } from "@/lib/supabase";
 
 /**
@@ -11,46 +12,56 @@ export async function GET() {
   const production = isProductionHosting();
   const supabase = getSupabase();
 
-  if (!supabase) {
-    return NextResponse.json({
-      ok: false,
-      production,
-      supabaseConfigured: false,
-      hasUrl,
-      hasServiceKey,
-      error: production
-        ? "SUPABASE_URL and/or SUPABASE_SERVICE_ROLE_KEY missing in Netlify env"
-        : "Supabase not configured (local JSON storage available)",
-    });
+  let supabaseReachable = false;
+  let supabaseError: string | null = null;
+
+  if (supabase) {
+    try {
+      const select = await supabase
+        .from("applications")
+        .select("id")
+        .limit(1);
+
+      if (select.error) {
+        supabaseError = select.error.message;
+        supabaseReachable = !isStorageUnreachable(select.error);
+      } else {
+        supabaseReachable = true;
+      }
+    } catch (error) {
+      supabaseError = error instanceof Error ? error.message : String(error);
+      supabaseReachable = false;
+    }
   }
 
-  const select = await supabase
-    .from("applications")
-    .select("id, acknowledgements")
-    .limit(1);
+  let blobsAvailable = false;
+  let blobsError: string | null = null;
 
-  if (select.error) {
-    return NextResponse.json({
-      ok: false,
-      production,
-      supabaseConfigured: true,
-      hasUrl,
-      hasServiceKey,
-      applicationsReadable: false,
-      error: select.error.message,
-      code: select.error.code,
-      details: select.error.details,
-      hint: select.error.hint,
-    });
+  if (production) {
+    try {
+      await readBlobJson("applications", []);
+      blobsAvailable = true;
+    } catch (error) {
+      blobsError = error instanceof Error ? error.message : String(error);
+    }
   }
+
+  const ok = supabaseReachable || blobsAvailable;
 
   return NextResponse.json({
-    ok: true,
+    ok,
     production,
-    supabaseConfigured: true,
+    supabaseConfigured: Boolean(supabase),
     hasUrl,
     hasServiceKey,
-    applicationsReadable: true,
-    acknowledgementsColumnPresent: true,
+    supabaseReachable,
+    supabaseError,
+    blobsAvailable,
+    blobsError,
+    storage: supabaseReachable
+      ? "supabase"
+      : blobsAvailable
+        ? "netlify-blobs"
+        : "unavailable",
   });
 }
