@@ -24,6 +24,7 @@ export async function GET() {
 
       if (select.error) {
         supabaseError = select.error.message;
+        // Reachable means DNS/network worked; schema/auth errors still count as reachable.
         supabaseReachable = !isStorageUnreachable(select.error);
       } else {
         supabaseReachable = true;
