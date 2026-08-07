@@ -1,9 +1,14 @@
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
+import {
+  isStorageUnreachable,
+  readBlobJson,
+  writeBlobJson,
+} from "./blob-store";
 import { INVESTOR, MEMBERSHIP } from "./constants";
 import type { MemberInfo, MembershipAcknowledgements } from "./schemas";
-import { getSupabase, isProductionHosting, requireSupabase } from "./supabase";
+import { getSupabase, isProductionHosting } from "./supabase";
 
 export type ApplicationKind = "membership" | "investment";
 
@@ -24,6 +29,7 @@ export type PendingApplication = MemberInfo & {
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const APPLICATIONS_FILE = path.join(DATA_DIR, "applications.json");
+const BLOB_KEY = "applications";
 
 async function readLocalApplications(): Promise<PendingApplication[]> {
   try {
@@ -41,23 +47,52 @@ async function writeLocalApplications(
   await fs.writeFile(APPLICATIONS_FILE, JSON.stringify(applications, null, 2));
 }
 
+async function readFallbackApplications(): Promise<PendingApplication[]> {
+  if (isProductionHosting()) {
+    return readBlobJson<PendingApplication[]>(BLOB_KEY, []);
+  }
+  return readLocalApplications();
+}
+
+async function writeFallbackApplications(
+  applications: PendingApplication[]
+): Promise<void> {
+  if (isProductionHosting()) {
+    await writeBlobJson(BLOB_KEY, applications);
+    return;
+  }
+  await writeLocalApplications(applications);
+}
+
 async function listAllApplications(): Promise<PendingApplication[]> {
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const { data, error } = await supabase
-      .from("applications")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) {
+        if (isStorageUnreachable(error)) {
+          console.error("Supabase unreachable; using fallback storage:", error);
+          return readFallbackApplications();
+        }
+        throw new Error(error.message);
+      }
+
+      return (data ?? []).map(mapFromDb);
+    } catch (error) {
+      if (isStorageUnreachable(error)) {
+        console.error("Supabase unreachable; using fallback storage:", error);
+        return readFallbackApplications();
+      }
+      throw error instanceof Error ? error : new Error(String(error));
     }
-
-    return (data ?? []).map(mapFromDb);
   }
 
-  return readLocalApplications();
+  return readFallbackApplications();
 }
 
 async function generateReferenceNumber(kind: ApplicationKind): Promise<string> {
@@ -105,16 +140,22 @@ export async function createApplication(
     acknowledgements: input.acknowledgements ?? null,
   };
 
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const payload = mapToDb(application);
-    const { error } = await supabase.from("applications").insert(payload);
+    try {
+      const payload = mapToDb(application);
+      const { error } = await supabase.from("applications").insert(payload);
 
-    if (error) {
+      if (!error) {
+        return application;
+      }
+
       const missingAcknowledgements =
         /acknowledgements/i.test(error.message) ||
-        /Could not find the ['"]acknowledgements['"] column/i.test(error.message);
+        /Could not find the ['"]acknowledgements['"] column/i.test(
+          error.message
+        );
 
       if (missingAcknowledgements) {
         throw new Error(
@@ -122,42 +163,56 @@ export async function createApplication(
         );
       }
 
-      throw new Error(error.message);
+      if (!isStorageUnreachable(error)) {
+        throw new Error(error.message);
+      }
+
+      console.error("Supabase insert unreachable; using fallback storage:", error);
+    } catch (error) {
+      if (!isStorageUnreachable(error)) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+      console.error("Supabase insert unreachable; using fallback storage:", error);
     }
-
-    return application;
   }
 
-  if (isProductionHosting()) {
-    throw new Error("Database storage is unavailable.");
-  }
-
-  const applications = await readLocalApplications();
+  const applications = await readFallbackApplications();
   applications.push(application);
-  await writeLocalApplications(applications);
+  await writeFallbackApplications(applications);
   return application;
 }
 
 export async function getApplicationByReference(
   referenceNumber: string
 ): Promise<PendingApplication | null> {
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const { data, error } = await supabase
-      .from("applications")
-      .select("*")
-      .eq("reference_number", referenceNumber)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*")
+        .eq("reference_number", referenceNumber)
+        .maybeSingle();
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) {
+        if (isStorageUnreachable(error)) {
+          console.error("Supabase unreachable; using fallback storage:", error);
+        } else {
+          throw new Error(error.message);
+        }
+      } else {
+        return data ? mapFromDb(data) : null;
+      }
+    } catch (error) {
+      if (!isStorageUnreachable(error)) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+      console.error("Supabase unreachable; using fallback storage:", error);
     }
-
-    return data ? mapFromDb(data) : null;
   }
 
-  const applications = await readLocalApplications();
+  const applications = await readFallbackApplications();
   return (
     applications.find((app) => app.referenceNumber === referenceNumber) ?? null
   );
@@ -166,39 +221,16 @@ export async function getApplicationByReference(
 export async function listApplications(
   filters?: { kind?: ApplicationKind; status?: PendingApplication["status"] }
 ): Promise<PendingApplication[]> {
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
-
-  if (supabase) {
-    let query = supabase.from("applications").select("*").order("created_at", {
-      ascending: false,
-    });
-
-    if (filters?.kind) {
-      query = query.eq("kind", filters.kind);
-    }
-    if (filters?.status) {
-      query = query.eq("status", filters.status);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return (data ?? []).map(mapFromDb);
-  }
-
-  let filtered = await readLocalApplications();
+  let applications = await listAllApplications();
 
   if (filters?.kind) {
-    filtered = filtered.filter((app) => app.kind === filters.kind);
+    applications = applications.filter((app) => app.kind === filters.kind);
   }
   if (filters?.status) {
-    filtered = filtered.filter((app) => app.status === filters.status);
+    applications = applications.filter((app) => app.status === filters.status);
   }
 
-  return filtered.sort(
+  return applications.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
@@ -222,30 +254,45 @@ export async function confirmApplication(
     confirmedAt: new Date().toISOString(),
   };
 
-  const supabase = isProductionHosting() ? requireSupabase() : getSupabase();
+  const supabase = getSupabase();
 
   if (supabase) {
-    const { error } = await supabase
-      .from("applications")
-      .update({
-        status: confirmed.status,
-        confirmed_at: confirmed.confirmedAt,
-      })
-      .eq("reference_number", referenceNumber);
+    try {
+      const { error } = await supabase
+        .from("applications")
+        .update({
+          status: confirmed.status,
+          confirmed_at: confirmed.confirmedAt,
+        })
+        .eq("reference_number", referenceNumber);
 
-    if (error) {
-      throw new Error(error.message);
+      if (!error) {
+        return confirmed;
+      }
+
+      if (!isStorageUnreachable(error)) {
+        throw new Error(error.message);
+      }
+
+      console.error("Supabase update unreachable; using fallback storage:", error);
+    } catch (error) {
+      if (!isStorageUnreachable(error)) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+      console.error("Supabase update unreachable; using fallback storage:", error);
     }
-
-    return confirmed;
   }
 
-  const applications = await readLocalApplications();
+  const applications = await readFallbackApplications();
   const index = applications.findIndex(
     (app) => app.referenceNumber === referenceNumber
   );
-  applications[index] = confirmed;
-  await writeLocalApplications(applications);
+  if (index === -1) {
+    applications.push(confirmed);
+  } else {
+    applications[index] = confirmed;
+  }
+  await writeFallbackApplications(applications);
   return confirmed;
 }
 

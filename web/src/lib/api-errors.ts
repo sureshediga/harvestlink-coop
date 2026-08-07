@@ -10,6 +10,7 @@ function isActionableDatabaseError(message: string): boolean {
     /SUPABASE_/,
     /Database is not configured/i,
     /Database storage is unavailable/i,
+    /Netlify Blobs/i,
     /relation .+ does not exist/i,
     /does not exist/i,
     /Could not find the .+ column/i,
@@ -24,6 +25,8 @@ function isActionableDatabaseError(message: string): boolean {
     /violates/i,
     /acknowledgements/i,
     /migration/i,
+    /ENOTFOUND/i,
+    /fetch failed/i,
   ];
 
   return patterns.some((pattern) => pattern.test(message));
