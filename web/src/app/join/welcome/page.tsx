@@ -26,7 +26,7 @@ export default async function WelcomePage({
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
         <h1 className="font-serif text-3xl font-semibold text-soil">
-          Welcome to HarvestLink
+          Welcome to HarvestLinx
         </h1>
         <p className="mt-4 text-soil/70">
           We couldn&apos;t find your membership confirmation. If you completed
@@ -67,7 +67,7 @@ export default async function WelcomePage({
       </h1>
       <p className="mt-4 text-lg text-soil/75">
         Thank you, {member.fullName.split(" ")[0]}. You are now an owner of
-        HarvestLink Cooperative.
+        HarvestLinx Cooperative.
       </p>
 
       <div className="mt-10 rounded-2xl border border-gold/20 bg-white p-6 text-left shadow-sm">

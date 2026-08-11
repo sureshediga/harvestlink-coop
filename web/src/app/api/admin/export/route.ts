@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv",
-      "Content-Disposition": `attachment; filename="harvestlink-members.csv"`,
+      "Content-Disposition": `attachment; filename="harvestlinx-members.csv"`,
     },
   });
 }

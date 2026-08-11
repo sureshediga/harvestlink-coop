@@ -40,7 +40,7 @@ export async function POST(request: Request) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `HarvestLink Cooperative Investment (${data.investmentUnits} units)`,
+              name: `HarvestLinx Cooperative Investment (${data.investmentUnits} units)`,
               description:
                 "Patron capital — dividends proportional, voting rights equal",
             },

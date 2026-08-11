@@ -1,6 +1,6 @@
 export const SITE = {
-  name: "HarvestLink",
-  legalName: "HarvestLink Cooperative",
+  name: "HarvestLinx",
+  legalName: "HarvestLinx Cooperative",
   tagline: "Member-Owned · Farmer-Connected · Middlemen-Free",
   description:
     "A member-owned consumer cooperative linking Indian diaspora households in the U.S. directly with farmer-owned organisations in India — disintermediated farm-to-consumer supply for pure products at better pricing.",
@@ -285,9 +285,9 @@ export const ROADMAP = [
 
 export const FAQ_ITEMS = [
   {
-    question: "What is HarvestLink Cooperative?",
+    question: "What is HarvestLinx Cooperative?",
     answer:
-      "HarvestLink is a member-owned consumer cooperative registered in Ohio, linking Indian diaspora households in the U.S. directly with Farmer Producer Organizations in India. We source safe, culturally authentic food without commodity middlemen.",
+      "HarvestLinx is a member-owned consumer cooperative registered in Ohio, linking Indian diaspora households in the U.S. directly with Farmer Producer Organizations in India. We source safe, culturally authentic food without commodity middlemen.",
   },
   {
     question: "What does membership cost and include?",
@@ -326,6 +326,6 @@ export const FAQ_ITEMS = [
   },
 ] as const;
 
-export const MEMBERSHIP_TERMS = `By joining HarvestLink Cooperative, I acknowledge the USD 100 one-time joining fee. I understand that the USD 100 membership fee grants member access and benefits but does not confer voting rights — voting rights require a minimum USD 1,000 cooperative capital investment (one member, one vote among voting members). I am applying for membership — not an investment contract. I agree to the cooperative principles of member ownership, farmer-connected sourcing, and community ownership.`;
+export const MEMBERSHIP_TERMS = `By joining HarvestLinx Cooperative, I acknowledge the USD 100 one-time joining fee. I understand that the USD 100 membership fee grants member access and benefits but does not confer voting rights — voting rights require a minimum USD 1,000 cooperative capital investment (one member, one vote among voting members). I am applying for membership — not an investment contract. I agree to the cooperative principles of member ownership, farmer-connected sourcing, and community ownership.`;
 
-export const INVESTMENT_TERMS = `By investing in HarvestLink Cooperative, I acknowledge this is patron capital of USD 1,000 or more, separate from my USD 100 membership fee. I understand that USD 1,000+ investment grants voting rights (one member, one vote among voting members) and that dividends may be proportional to my investment. I agree to the cooperative investment terms and confirm I am or will become a cooperative member. Investment carries cooperative business risk.`;
+export const INVESTMENT_TERMS = `By investing in HarvestLinx Cooperative, I acknowledge this is patron capital of USD 1,000 or more, separate from my USD 100 membership fee. I understand that USD 1,000+ investment grants voting rights (one member, one vote among voting members) and that dividends may be proportional to my investment. I agree to the cooperative investment terms and confirm I am or will become a cooperative member. Investment carries cooperative business risk.`;

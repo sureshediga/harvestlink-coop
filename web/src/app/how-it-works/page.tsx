@@ -17,7 +17,7 @@ export default function HowItWorksPage() {
     <>
       <PageHero
         eyebrow="Indo-US cooperative linkage"
-        title="How HarvestLink Works"
+        title="How HarvestLinx Works"
         description="A member-governed institution on the demand side, matched with farmer-owned organisations on the supply side."
       />
 
