@@ -68,7 +68,10 @@ Gamify founding membership on the marketing site by showing how many people have
 - **Body:** Proud to source produce directly from farmer-owned organisations
 - **Tagline:** Be the member you can be. Source direct from farmers & Eat healthy
 - **Fields:** Signed name from enrollment disclosure, application reference number, signed/issue date
+- **Standing line (under name):** "Our Nth member" (membership) or "Our Nth investor" (investment), where N is the ordinal parsed from the reference number's trailing sequence (e.g. `HL-APP-2026-0002` → 2nd). Hidden when the ordinal can't be determined.
 - **Disclosure (small):** Membership activates after joining-fee payment is confirmed
+
+The certificate is shared by both `/join/instructions` (membership, `HL-APP-...`) and `/invest/instructions` (investment, `HL-INV-...`); the standing-line noun switches on application kind.
 
 ### Delivery
 

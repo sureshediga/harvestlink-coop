@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { MembershipCertificate } from "@/components/MembershipCertificate";
 import { WaysToPay } from "@/components/WaysToPay";
-import { getApplicationByReference } from "@/lib/applications";
+import {
+  applicationStandingLabel,
+  getApplicationByReference,
+} from "@/lib/applications";
 
 export const metadata = {
   title: "Payment Instructions",
@@ -62,6 +65,10 @@ export default async function InstructionsPage({
     day: "numeric",
     timeZone: "UTC",
   });
+  const standingLabel = applicationStandingLabel(
+    application.referenceNumber,
+    "membership"
+  );
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -84,6 +91,7 @@ export default async function InstructionsPage({
           name={certificateName}
           referenceNumber={application.referenceNumber}
           issueDate={issueDate}
+          standingLabel={standingLabel}
         />
       </div>
 

@@ -7,6 +7,7 @@ type Props = {
   name: string;
   referenceNumber: string;
   issueDate: string;
+  standingLabel?: string | null;
 };
 
 function drawWrappedText(
@@ -81,6 +82,8 @@ function buildCertificatePng(props: Props): string {
   ctx.font = "italic 26px Georgia, serif";
   ctx.fillText("This certifies that", centerX, 470);
 
+  const terracotta = "#c4704a";
+
   ctx.fillStyle = green;
   ctx.font = "bold 64px Georgia, serif";
   ctx.fillText(props.name, centerX, 555);
@@ -92,13 +95,19 @@ function buildCertificatePng(props: Props): string {
   ctx.lineTo(centerX + 260, 585);
   ctx.stroke();
 
+  if (props.standingLabel) {
+    ctx.fillStyle = terracotta;
+    ctx.font = "bold 34px Georgia, serif";
+    ctx.fillText(props.standingLabel, centerX, 640);
+  }
+
   ctx.fillStyle = soil;
   ctx.font = "30px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.body, centerX, 660, width - 300, 42);
+  drawWrappedText(ctx, CERTIFICATE.body, centerX, 710, width - 300, 42);
 
   ctx.fillStyle = green;
   ctx.font = "italic 28px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.tagline, centerX, 800, width - 300, 40);
+  drawWrappedText(ctx, CERTIFICATE.tagline, centerX, 830, width - 300, 40);
 
   ctx.fillStyle = soil;
   ctx.font = "bold 26px Georgia, serif";
@@ -113,7 +122,12 @@ function buildCertificatePng(props: Props): string {
   return canvas.toDataURL("image/png");
 }
 
-export function MembershipCertificate({ name, referenceNumber, issueDate }: Props) {
+export function MembershipCertificate({
+  name,
+  referenceNumber,
+  issueDate,
+  standingLabel,
+}: Props) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   function handlePrint() {
@@ -123,7 +137,12 @@ export function MembershipCertificate({ name, referenceNumber, issueDate }: Prop
   function handleDownloadPng() {
     setDownloadError(null);
     try {
-      const dataUrl = buildCertificatePng({ name, referenceNumber, issueDate });
+      const dataUrl = buildCertificatePng({
+        name,
+        referenceNumber,
+        issueDate,
+        standingLabel,
+      });
       const link = document.createElement("a");
       link.href = dataUrl;
       link.download = `harvestlinx-certificate-${referenceNumber}.png`;
@@ -159,6 +178,11 @@ export function MembershipCertificate({ name, referenceNumber, issueDate }: Prop
           <p className="mt-2 font-serif text-3xl font-bold text-green sm:text-4xl">
             {name}
           </p>
+          {standingLabel && (
+            <p className="mt-2 font-serif text-lg font-semibold text-terracotta">
+              {standingLabel}
+            </p>
+          )}
           <div className="mx-auto mt-3 h-px w-48 bg-gold/60" />
 
           <p className="mx-auto mt-6 max-w-md text-base text-soil/80">

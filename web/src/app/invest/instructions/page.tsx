@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { MembershipCertificate } from "@/components/MembershipCertificate";
 import { WaysToPay } from "@/components/WaysToPay";
-import { getApplicationByReference } from "@/lib/applications";
+import {
+  applicationStandingLabel,
+  getApplicationByReference,
+} from "@/lib/applications";
 
 export const metadata = {
   title: "Investment Payment Instructions",
@@ -29,6 +33,17 @@ export default async function InvestInstructionsPage({
     );
   }
 
+  const issueDate = new Date(application.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+  const standingLabel = applicationStandingLabel(
+    application.referenceNumber,
+    "investment"
+  );
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <div className="text-center">
@@ -43,6 +58,15 @@ export default async function InvestInstructionsPage({
           {application.investmentUnits} unit(s). We&apos;ll confirm within 1–2 business
           days after payment.
         </p>
+      </div>
+
+      <div className="mx-auto mt-10 max-w-xl">
+        <MembershipCertificate
+          name={application.fullName}
+          referenceNumber={application.referenceNumber}
+          issueDate={issueDate}
+          standingLabel={standingLabel}
+        />
       </div>
 
       <div className="mt-10">
