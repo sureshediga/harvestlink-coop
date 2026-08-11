@@ -247,6 +247,21 @@ function mapFromDb(row: Record<string, unknown>): MemberRecord {
   };
 }
 
+/**
+ * Server-side member count for first-paint rendering.
+ * Returns null (never throws) when storage is unavailable so callers can
+ * show honest fallback copy instead of a fabricated number.
+ */
+export async function getMemberCountSafe(): Promise<number | null> {
+  try {
+    const members = await listMembers();
+    return members.length;
+  } catch (error) {
+    console.error("Member count unavailable; showing fallback copy:", error);
+    return null;
+  }
+}
+
 export function membersToCsv(members: MemberRecord[]): string {
   const headers = [
     "member_number",

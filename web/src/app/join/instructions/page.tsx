@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MembershipCertificate } from "@/components/MembershipCertificate";
 import { WaysToPay } from "@/components/WaysToPay";
 import { getApplicationByReference } from "@/lib/applications";
 
@@ -52,6 +53,16 @@ export default async function InstructionsPage({
 
   const totalDollars = application.totalAmount / 100;
 
+  const certificateName =
+    application.acknowledgements?.enrollmentDisclosure.signedName ??
+    application.fullName;
+  const issueDate = new Date(application.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <div className="text-center">
@@ -66,6 +77,14 @@ export default async function InstructionsPage({
           below to pay via Zelle. We&apos;ll activate your founding membership
           membership within 1–2 business days after payment is received.
         </p>
+      </div>
+
+      <div className="mx-auto mt-10 max-w-xl">
+        <MembershipCertificate
+          name={certificateName}
+          referenceNumber={application.referenceNumber}
+          issueDate={issueDate}
+        />
       </div>
 
       <div className="mt-10">

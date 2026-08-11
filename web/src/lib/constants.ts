@@ -15,6 +15,23 @@ export const SITE = {
 export const FRAMING_NOTE =
   "This is not a charity model, a remittance scheme, or a cultural nostalgia project. It is a structural market intervention: a member-governed institution on the demand side matched with democratically governed institutions on the supply side.";
 
+export const MEMBERSHIP_TAGLINE =
+  "Be the member you can be. Source direct from farmers & Eat healthy";
+
+export const MEMBER_COUNT = {
+  label: "founding members",
+  tagline: MEMBERSHIP_TAGLINE,
+  fallbackHeadline: "Be among our founding members",
+} as const;
+
+export const CERTIFICATE = {
+  title: "Proud Farmer Cooperative Member",
+  org: "HarvestLinx Cooperative",
+  body: "Proud to source produce directly from farmer-owned organisations",
+  tagline: MEMBERSHIP_TAGLINE,
+  note: "Membership activates after joining-fee payment is confirmed",
+} as const;
+
 export const MEMBERSHIP = {
   joiningFee: 100,
   title: "Membership",

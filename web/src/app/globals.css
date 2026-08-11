@@ -36,3 +36,28 @@ h3,
 h4 {
   font-family: var(--font-fraunces), Georgia, serif;
 }
+
+/* Print: show only the membership certificate, hide site chrome and buttons. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .certificate-print,
+  .certificate-print * {
+    visibility: visible;
+  }
+
+  .certificate-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
