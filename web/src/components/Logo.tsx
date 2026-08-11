@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
 
-const LOGO_WIDTH = 1235;
-const LOGO_HEIGHT = 1194;
+const LOGO_WIDTH = 1024;
+const LOGO_HEIGHT = 1024;
 
 type LogoProps = {
   className?: string;
