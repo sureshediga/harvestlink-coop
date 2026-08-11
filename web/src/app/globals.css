@@ -37,7 +37,8 @@ h4 {
   font-family: var(--font-fraunces), Georgia, serif;
 }
 
-/* Print: show only the membership certificate, hide site chrome and buttons. */
+/* Print: show only one downloadable (certificate by default, or the ID card
+   when body.printing-idcard is set), hiding site chrome and buttons. */
 @media print {
   body * {
     visibility: hidden;
@@ -49,6 +50,25 @@ h4 {
   }
 
   .certificate-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.printing-idcard .certificate-print,
+  body.printing-idcard .certificate-print * {
+    visibility: hidden;
+  }
+
+  body.printing-idcard .idcard-print,
+  body.printing-idcard .idcard-print * {
+    visibility: visible;
+  }
+
+  body.printing-idcard .idcard-print {
     position: absolute;
     left: 0;
     top: 0;

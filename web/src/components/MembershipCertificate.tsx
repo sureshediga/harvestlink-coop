@@ -131,6 +131,7 @@ export function MembershipCertificate({
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   function handlePrint() {
+    document.body.classList.remove("printing-idcard");
     window.print();
   }
 

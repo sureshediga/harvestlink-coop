@@ -73,6 +73,17 @@ Gamify founding membership on the marketing site by showing how many people have
 
 The certificate is shared by both `/join/instructions` (membership, `HL-APP-...`) and `/invest/instructions` (investment, `HL-INV-...`); the standing-line noun switches on application kind.
 
+### Member ID card
+
+Alongside the certificate, each instructions page renders a downloadable **Member ID card** (`MemberIdCard` component) with:
+
+- **Name** — signed name (membership) or applicant full name (investment)
+- **Member ID** — derived from the reference, `HL-M-YYYY-NNNN` (membership) or `HL-I-YYYY-NNNN` (investment) via `applicationMemberId()`
+- **Member since** — application creation month/year
+- **Type** — "Founding Member" or "Investor" via `applicationTypeLabel()`
+
+Delivery mirrors the certificate: on-screen card + **Download PNG** (dependency-free canvas, landscape card) + **Print / Save as PDF**. Print targeting uses a `body.printing-idcard` class so the ID card prints on its own (certificate is the default print target).
+
 ### Delivery
 
 1. **On-screen** designed certificate panel

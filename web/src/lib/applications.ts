@@ -224,6 +224,26 @@ export function applicationStandingLabel(
   return `Our ${ordinalWithSuffix(ordinal)} ${noun}`;
 }
 
+/**
+ * Human-facing member ID for the ID card, derived from the application
+ * reference (e.g. "HL-APP-2026-0002" -> "HL-M-2026-0002", investment ->
+ * "HL-I-..."). Falls back to the raw reference when it can't be parsed.
+ */
+export function applicationMemberId(
+  referenceNumber: string,
+  kind: ApplicationKind
+): string {
+  const match = referenceNumber.match(/(\d{4})-(\d+)\s*$/);
+  const infix = kind === "investment" ? "I" : "M";
+  if (!match) return referenceNumber;
+  return `HL-${infix}-${match[1]}-${match[2]}`;
+}
+
+/** Membership type label for the ID card. */
+export function applicationTypeLabel(kind: ApplicationKind): string {
+  return kind === "investment" ? "Investor" : "Founding Member";
+}
+
 export async function getApplicationByReference(
   referenceNumber: string
 ): Promise<PendingApplication | null> {

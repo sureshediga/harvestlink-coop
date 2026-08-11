@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { MemberIdCard } from "@/components/MemberIdCard";
 import { MembershipCertificate } from "@/components/MembershipCertificate";
 import { WaysToPay } from "@/components/WaysToPay";
 import {
+  applicationMemberId,
   applicationStandingLabel,
+  applicationTypeLabel,
   getApplicationByReference,
 } from "@/lib/applications";
 
@@ -69,6 +72,13 @@ export default async function InstructionsPage({
     application.referenceNumber,
     "membership"
   );
+  const memberId = applicationMemberId(application.referenceNumber, "membership");
+  const memberSince = new Date(application.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
+  const memberType = applicationTypeLabel("membership");
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -87,15 +97,34 @@ export default async function InstructionsPage({
       </div>
 
       <div className="mx-auto mt-10 max-w-xl">
-        <MembershipCertificate
-          name={certificateName}
-          referenceNumber={application.referenceNumber}
-          issueDate={issueDate}
-          standingLabel={standingLabel}
-        />
+        <h2 className="text-center font-serif text-lg font-semibold text-soil">
+          Your Founding Membership Certificate
+        </h2>
+        <div className="mt-4">
+          <MembershipCertificate
+            name={certificateName}
+            referenceNumber={application.referenceNumber}
+            issueDate={issueDate}
+            standingLabel={standingLabel}
+          />
+        </div>
       </div>
 
-      <div className="mt-10">
+      <div className="mx-auto mt-12 max-w-xl">
+        <h2 className="text-center font-serif text-lg font-semibold text-soil">
+          Your Member ID Card
+        </h2>
+        <div className="mt-4">
+          <MemberIdCard
+            name={certificateName}
+            memberId={memberId}
+            memberSince={memberSince}
+            type={memberType}
+          />
+        </div>
+      </div>
+
+      <div className="mt-12">
         <WaysToPay
           referenceNumber={application.referenceNumber}
           totalDollars={totalDollars}
