@@ -87,7 +87,7 @@ export function InvestForm() {
       {step === 1 && (
         <div className="rounded-2xl border border-gold/20 bg-white p-6 shadow-sm sm:p-8">
           <h1 className="font-serif text-3xl font-semibold text-soil">
-            Invest in HarvestLink
+            Invest in HarvestLinx
           </h1>
           <p className="mt-3 text-soil/75">{INVESTOR.summary}</p>
 

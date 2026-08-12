@@ -1,6 +1,6 @@
-# HarvestLink Cooperative Website
+# HarvestLinx Cooperative Website
 
-Consumer-friendly pre-launch site for **HarvestLink Cooperative** — a member-owned cooperative connecting U.S. consumers to farmer partners in India.
+Consumer-friendly pre-launch site for **HarvestLinx Cooperative** — a member-owned cooperative connecting U.S. consumers to farmer partners in India.
 
 ## Features
 

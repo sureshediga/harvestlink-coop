@@ -182,6 +182,68 @@ export async function createApplication(
   return application;
 }
 
+/**
+ * Ordinal position of an application within its kind, parsed from the trailing
+ * sequence in the reference number (e.g. "HL-APP-2026-0002" -> 2). Returns null
+ * when no trailing number can be found.
+ */
+export function getApplicationOrdinal(referenceNumber: string): number | null {
+  const match = referenceNumber.match(/(\d+)\s*$/);
+  if (!match) return null;
+  const value = Number.parseInt(match[1], 10);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+/** Formats a positive integer with its English ordinal suffix (1 -> "1st"). */
+export function ordinalWithSuffix(n: number): string {
+  const rem100 = n % 100;
+  if (rem100 >= 11 && rem100 <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
+
+/**
+ * "Our Nth member" / "Our Nth investor" line for certificates, derived from the
+ * application reference. Returns null when the ordinal can't be determined.
+ */
+export function applicationStandingLabel(
+  referenceNumber: string,
+  kind: ApplicationKind
+): string | null {
+  const ordinal = getApplicationOrdinal(referenceNumber);
+  if (ordinal === null) return null;
+  const noun = kind === "investment" ? "investor" : "member";
+  return `Our ${ordinalWithSuffix(ordinal)} ${noun}`;
+}
+
+/**
+ * Human-facing member ID for the ID card, derived from the application
+ * reference (e.g. "HL-APP-2026-0002" -> "HL-M-2026-0002", investment ->
+ * "HL-I-..."). Falls back to the raw reference when it can't be parsed.
+ */
+export function applicationMemberId(
+  referenceNumber: string,
+  kind: ApplicationKind
+): string {
+  const match = referenceNumber.match(/(\d{4})-(\d+)\s*$/);
+  const infix = kind === "investment" ? "I" : "M";
+  if (!match) return referenceNumber;
+  return `HL-${infix}-${match[1]}-${match[2]}`;
+}
+
+/** Membership type label for the ID card. */
+export function applicationTypeLabel(kind: ApplicationKind): string {
+  return kind === "investment" ? "Investor" : "Founding Member";
+}
+
 export async function getApplicationByReference(
   referenceNumber: string
 ): Promise<PendingApplication | null> {

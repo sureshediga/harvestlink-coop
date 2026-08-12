@@ -40,7 +40,7 @@ export async function POST(request: Request) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: "HarvestLink Cooperative Membership",
+              name: "HarvestLinx Cooperative Membership",
               description: `USD ${MEMBERSHIP.joiningFee} joining fee. Voting rights from USD 1,000+ investment.`,
             },
             unit_amount: MEMBERSHIP.joiningFee * 100,

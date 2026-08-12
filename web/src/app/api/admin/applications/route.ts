@@ -33,7 +33,7 @@ export async function GET(request: Request) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv",
-      "Content-Disposition": `attachment; filename="harvestlink-applications.csv"`,
+      "Content-Disposition": `attachment; filename="harvestlinx-applications.csv"`,
     },
   });
 }

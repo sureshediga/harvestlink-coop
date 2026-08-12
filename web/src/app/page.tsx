@@ -8,12 +8,19 @@ import {
   FRAMING_NOTE,
   INVESTOR,
   LOGISTICS_STAGES,
+  MEMBER_COUNT,
   MEMBERSHIP,
   PILLARS,
   PRODUCT_LINES,
 } from "@/lib/constants";
+import { getMemberCountSafe } from "@/lib/members";
 
-export default function HomePage() {
+// Member count is read at request time so it stays current.
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const memberCount = await getMemberCountSafe();
+
   return (
     <>
       <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24">
@@ -108,7 +115,28 @@ export default function HomePage() {
             <h2 className="font-serif text-2xl font-semibold text-soil">
               Membership — ${MEMBERSHIP.joiningFee}
             </h2>
-            <ul className="mt-4 space-y-2 text-sm text-soil/75">
+
+            <div className="mt-6 rounded-xl bg-green/10 p-5 text-center">
+              {memberCount === null ? (
+                <p className="font-serif text-2xl font-semibold text-green">
+                  {MEMBER_COUNT.fallbackHeadline}
+                </p>
+              ) : (
+                <p>
+                  <span className="block font-serif text-5xl font-bold leading-none text-green">
+                    {memberCount.toLocaleString()}
+                  </span>
+                  <span className="mt-2 block text-sm font-semibold uppercase tracking-wide text-green/80">
+                    {MEMBER_COUNT.label}
+                  </span>
+                </p>
+              )}
+              <p className="mt-3 text-sm italic text-soil/70">
+                {MEMBER_COUNT.tagline}
+              </p>
+            </div>
+
+            <ul className="mt-6 space-y-2 text-sm text-soil/75">
               {MEMBERSHIP.benefits.slice(0, 4).map((b) => (
                 <li key={b}>✓ {b}</li>
               ))}

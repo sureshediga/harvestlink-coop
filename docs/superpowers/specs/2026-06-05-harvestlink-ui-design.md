@@ -1,4 +1,4 @@
-# HarvestLink Cooperative — UI Design Spec
+# HarvestLinx Cooperative — UI Design Spec
 
 **Date:** 2026-06-05  
 **Status:** Approved pending user review  
@@ -8,7 +8,7 @@
 
 ## 1. Overview
 
-HarvestLink Cooperative is a consumer-owned cooperative connecting U.S. members directly to farmer-owned organizations, mission-driven entrepreneurs, and ethical small producers in India. The website is a **pre-launch membership hub** centered on **online founding-member signup** ($100 lifetime membership) before the first Texas store opens.
+HarvestLinx Cooperative is a consumer-owned cooperative connecting U.S. members directly to farmer-owned organizations, mission-driven entrepreneurs, and ethical small producers in India. The website is a **pre-launch membership hub** centered on **online founding-member signup** ($100 lifetime membership) before the first Texas store opens.
 
 ### Core tagline
 
@@ -24,7 +24,7 @@ Every page funnels to **Become a Founding Member — $100** with secure online p
 
 | Item | Detail |
 |---|---|
-| Legal entity | HarvestLink Cooperative (Ohio domestic cooperative) |
+| Legal entity | HarvestLinx Cooperative (Ohio domestic cooperative) |
 | First store | Texas — opening within ~3 months |
 | Status | Shipments from India in transit |
 | Expansion | Major U.S. cities after Texas launch |
@@ -140,7 +140,7 @@ Quick links, cooperative tagline, contact email, Ohio cooperative registration n
 Visual flow diagram:
 
 ```
-Indian farmer orgs → HarvestLink Cooperative → Texas store → Your table
+Indian farmer orgs → HarvestLinx Cooperative → Texas store → Your table
 ```
 
 Sections:
@@ -205,7 +205,7 @@ CTA: **Become a Founding Member**
 ### 5.7 FAQ
 
 Suggested questions:
-- What is HarvestLink Cooperative?
+- What is HarvestLinx Cooperative?
 - What does my $100 membership include?
 - What is the difference between membership and investment?
 - When will the Texas store open?
@@ -258,7 +258,7 @@ Validation: client-side (Zod) + server-side on submit.
 ```
 Lifetime Membership                    $100.00
 ─────────────────────────────────────────────
-☐ I agree to HarvestLink Cooperative membership terms
+☐ I agree to HarvestLinx Cooperative membership terms
 
 [ Pay $100 — Become a Founding Member ]
 
@@ -291,7 +291,7 @@ Terms checkbox required before payment.
 ### Step 4 — Stripe Checkout
 
 - Stripe Checkout Session with line items:
-  - `HarvestLink Lifetime Membership` — $100.00
+  - `HarvestLinx Lifetime Membership` — $100.00
   - `Cooperative Investment (N units)` — $N.00 *(if applicable)*
 - Success redirect: `/join/welcome?session_id={CHECKOUT_SESSION_ID}`
 - Cancel redirect: `/join?cancelled=true`

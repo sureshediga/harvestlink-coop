@@ -87,7 +87,7 @@ export async function createPayPalOrder(input: {
     input.kind === "membership"
       ? [
           {
-            name: "HarvestLink Cooperative Membership",
+            name: "HarvestLinx Cooperative Membership",
             description: "USD 100 joining fee — voting rights from USD 1,000+ investment",
             unit_amount: {
               currency_code: "USD",
@@ -99,7 +99,7 @@ export async function createPayPalOrder(input: {
         ]
       : [
           {
-            name: `HarvestLink Investment (${investmentUnits} units)`,
+            name: `HarvestLinx Investment (${investmentUnits} units)`,
             description: "Patron capital — dividends proportional",
             unit_amount: {
               currency_code: "USD",
@@ -135,7 +135,7 @@ export async function createPayPalOrder(input: {
         },
       ],
       application_context: {
-        brand_name: "HarvestLink Cooperative",
+        brand_name: "HarvestLinx Cooperative",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
         return_url: `${siteUrl}${capturePath}`,

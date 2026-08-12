@@ -24,3 +24,6 @@ Thumbs.db
 
 # Build artifacts
 *.tsbuildinfo
+
+# Brainstorm / agent local artifacts
+.superpowers/
