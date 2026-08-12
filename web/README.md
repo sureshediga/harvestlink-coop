@@ -8,6 +8,7 @@ Consumer-friendly pre-launch site for **HarvestLinx Cooperative** — a member-o
 - Founding member signup via **Zelle** (614-961-9552)
 - Optional cooperative investment (multiples of $100)
 - Member and application storage (Supabase required on Netlify; local JSON for dev)
+- Admin page (`/admin`) to view and confirm all membership/investment signups
 - Admin CSV export of members
 
 ## Quick Start
@@ -36,7 +37,7 @@ Copy `.env.example` to `.env.local` and configure:
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Production site URL (Netlify sets `URL` automatically for API routes) |
 | `SUPABASE_URL` | **Required on Netlify** | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Required on Netlify** | Supabase service role key |
-| `ADMIN_EXPORT_KEY` | Optional | Bearer token for CSV export |
+| `ADMIN_EXPORT_KEY` | Optional | Secret key for `/admin` UI and CSV/confirm APIs |
 
 Without Supabase, records are stored in `data/*.json` (local dev only — not persisted on Netlify).
 
@@ -94,9 +95,21 @@ Recommended setup:
 
 A **501** usually means the Next.js runtime did not handle the API route — confirm build logs show `Using Next.js Runtime - v5` and that `@netlify/plugin-nextjs` is installed.
 
-## Admin: Pending Applications
+## Admin: View Signups
 
-Export all membership applications (pending Zelle payments):
+Open **`/admin`** on the deployed site (or `http://localhost:3000/admin` locally) and sign in with the same value as `ADMIN_EXPORT_KEY`.
+
+From the page you can:
+
+- See all membership and investment signups (filter by type/status, search by name/email/phone/reference)
+- Mark pending Zelle payments as paid (activates membership)
+- Download a CSV of the current filtered list
+
+The admin key stays in browser `sessionStorage` for the tab only — it is never put in the URL.
+
+### CLI alternatives
+
+Export pending applications:
 
 ```bash
 curl -H "Authorization: Bearer YOUR_ADMIN_EXPORT_KEY" \

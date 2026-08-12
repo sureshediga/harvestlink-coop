@@ -31,7 +31,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [kindFilter, setKindFilter] = useState<KindFilter>("membership");
+  const [kindFilter, setKindFilter] = useState<KindFilter>("all");
+  const [query, setQuery] = useState("");
   const [confirming, setConfirming] = useState<string | null>(null);
 
   const load = useCallback(
@@ -193,19 +194,36 @@ export default function AdminPage() {
     );
   }
 
-  const total = apps.length;
-  const pending = apps.filter((a) => a.status === "pending_payment").length;
-  const confirmed = apps.filter((a) => a.status === "confirmed").length;
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleApps = normalizedQuery
+    ? apps.filter((a) => {
+        const haystack = [
+          a.fullName,
+          a.email,
+          a.phone,
+          a.referenceNumber,
+          a.city,
+          a.state,
+          a.zip,
+        ]
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(normalizedQuery);
+      })
+    : apps;
+  const total = visibleApps.length;
+  const pending = visibleApps.filter((a) => a.status === "pending_payment").length;
+  const confirmed = visibleApps.filter((a) => a.status === "confirmed").length;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-serif text-3xl font-semibold text-soil">
-            Membership Signups
+            All Signups
           </h1>
           <p className="mt-1 text-sm text-soil/60">
-            Applications submitted through the site.
+            Membership and investment applications submitted through the site.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -255,9 +273,9 @@ export default function AdminPage() {
             onChange={(e) => handleKindChange(e.target.value as KindFilter)}
             className="ml-2 rounded-lg border border-gold/40 px-3 py-2 text-sm text-soil"
           >
+            <option value="all">All</option>
             <option value="membership">Membership</option>
             <option value="investment">Investment</option>
-            <option value="all">All</option>
           </select>
         </label>
         <label className="text-sm text-soil/70">
@@ -271,6 +289,16 @@ export default function AdminPage() {
             <option value="pending_payment">Pending payment</option>
             <option value="confirmed">Confirmed</option>
           </select>
+        </label>
+        <label className="min-w-[220px] flex-1 text-sm text-soil/70">
+          Search
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Name, email, phone, or reference"
+            className="ml-2 w-[calc(100%-4rem)] min-w-[180px] rounded-lg border border-gold/40 px-3 py-2 text-sm text-soil"
+          />
         </label>
         <button
           type="button"
@@ -308,14 +336,14 @@ export default function AdminPage() {
                   Loading…
                 </td>
               </tr>
-            ) : apps.length === 0 ? (
+            ) : visibleApps.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-10 text-center text-soil/50">
                   No signups match the current filters.
                 </td>
               </tr>
             ) : (
-              apps.map((a) => (
+              visibleApps.map((a) => (
                 <tr key={a.id} className="align-top">
                   <td className="px-4 py-3 text-soil/70">
                     {formatDate(a.createdAt)}
