@@ -80,7 +80,10 @@ export function JoinForm() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Unable to submit");
-      window.location.href = `/join/instructions?ref=${encodeURIComponent(data.referenceNumber)}`;
+      const tokenParam = data.accessToken
+        ? `&t=${encodeURIComponent(data.accessToken)}`
+        : "";
+      window.location.href = `/join/instructions?ref=${encodeURIComponent(data.referenceNumber)}${tokenParam}`;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);

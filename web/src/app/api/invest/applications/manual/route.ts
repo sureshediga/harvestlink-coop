@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createApplication } from "@/lib/applications";
 import { publicApiErrorMessage } from "@/lib/api-errors";
 import { investmentCheckoutSchema } from "@/lib/schemas";
+import { signAccessToken } from "@/lib/verify";
 
 export async function POST(request: Request) {
   try {
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       referenceNumber: application.referenceNumber,
       totalAmount: application.totalAmount,
+      accessToken: signAccessToken(application.referenceNumber),
     });
   } catch (error) {
     console.error("Manual investment application error:", error);

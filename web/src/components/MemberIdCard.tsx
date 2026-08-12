@@ -8,9 +8,27 @@ type Props = {
   memberId: string;
   memberSince: string;
   type: string;
+  statusLabel?: string;
+  isActive?: boolean;
+  qrDataUrl?: string;
+  verifyUrl?: string;
 };
 
-function buildIdCardPng(props: Props): string {
+async function loadImage(src: string): Promise<HTMLImageElement> {
+  const img = new Image();
+  img.src = src;
+  if (typeof img.decode === "function") {
+    await img.decode();
+  } else {
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("QR image failed to load"));
+    });
+  }
+  return img;
+}
+
+async function buildIdCardPng(props: Props): Promise<string> {
   const width = 1000;
   const height = 630;
   const canvas = document.createElement("canvas");
@@ -59,16 +77,51 @@ function buildIdCardPng(props: Props): string {
     ctx.fillText(valueText, x, y + 42);
   };
 
-  drawField("NAME", props.name, 55, 230, soil, 42);
-  drawField("MEMBER ID", props.memberId, 55, 360, green, 32);
-  drawField("TYPE", props.type, 540, 360, soil, 32);
-  drawField("MEMBER SINCE", props.memberSince, 55, 490, soil, 30);
+  drawField("NAME", props.name, 55, 220, soil, 40);
+  drawField("MEMBER ID", props.memberId, 55, 345, green, 30);
+  drawField("TYPE", props.type, 460, 345, soil, 30);
+  drawField("MEMBER SINCE", props.memberSince, 55, 470, soil, 28);
+  if (props.statusLabel) {
+    drawField(
+      "STATUS",
+      props.statusLabel,
+      460,
+      470,
+      props.isActive ? green : "#b7791f",
+      28
+    );
+  }
+
+  if (props.qrDataUrl) {
+    try {
+      const qr = await loadImage(props.qrDataUrl);
+      const qrSize = 150;
+      ctx.drawImage(qr, width - qrSize - 55, 175, qrSize, qrSize);
+      ctx.fillStyle = label;
+      ctx.font = "16px Georgia, serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Scan to verify", width - 55 - qrSize / 2, 345);
+      ctx.textAlign = "left";
+    } catch {
+      // QR is best-effort; skip if it fails to load.
+    }
+  }
 
   return canvas.toDataURL("image/png");
 }
 
-export function MemberIdCard({ name, memberId, memberSince, type }: Props) {
+export function MemberIdCard({
+  name,
+  memberId,
+  memberSince,
+  type,
+  statusLabel,
+  isActive,
+  qrDataUrl,
+  verifyUrl,
+}: Props) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   function handlePrint() {
     document.body.classList.add("printing-idcard");
@@ -80,10 +133,19 @@ export function MemberIdCard({ name, memberId, memberSince, type }: Props) {
     window.print();
   }
 
-  function handleDownloadPng() {
+  async function handleDownloadPng() {
     setDownloadError(null);
+    setDownloading(true);
     try {
-      const dataUrl = buildIdCardPng({ name, memberId, memberSince, type });
+      const dataUrl = await buildIdCardPng({
+        name,
+        memberId,
+        memberSince,
+        type,
+        statusLabel,
+        isActive,
+        qrDataUrl,
+      });
       const link = document.createElement("a");
       link.href = dataUrl;
       link.download = `harvestlinx-member-id-${memberId}.png`;
@@ -95,6 +157,8 @@ export function MemberIdCard({ name, memberId, memberSince, type }: Props) {
       setDownloadError(
         "Couldn't generate the image. You can still use Print / Save as PDF."
       );
+    } finally {
+      setDownloading(false);
     }
   }
 
@@ -110,35 +174,69 @@ export function MemberIdCard({ name, memberId, memberSince, type }: Props) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-5 px-6 py-7 sm:px-8">
-          <div className="col-span-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
-              Name
-            </p>
-            <p className="mt-1 font-serif text-2xl font-bold text-soil">{name}</p>
+        <div className="flex items-start justify-between gap-4 px-6 py-7 sm:px-8">
+          <div className="grid flex-1 grid-cols-2 gap-x-6 gap-y-5">
+            <div className="col-span-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
+                Name
+              </p>
+              <p className="mt-1 font-serif text-2xl font-bold text-soil">
+                {name}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
+                Member ID
+              </p>
+              <p className="mt-1 font-serif text-lg font-bold text-green">
+                {memberId}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
+                Type
+              </p>
+              <p className="mt-1 font-serif text-lg font-bold text-soil">
+                {type}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
+                Member since
+              </p>
+              <p className="mt-1 font-serif text-lg font-semibold text-soil">
+                {memberSince}
+              </p>
+            </div>
+            {statusLabel && (
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
+                  Status
+                </p>
+                <p
+                  className={`mt-1 font-serif text-lg font-bold ${
+                    isActive ? "text-green" : "text-[#b7791f]"
+                  }`}
+                >
+                  {statusLabel}
+                </p>
+              </div>
+            )}
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
-              Member ID
-            </p>
-            <p className="mt-1 font-serif text-lg font-bold text-green">
-              {memberId}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
-              Type
-            </p>
-            <p className="mt-1 font-serif text-lg font-bold text-soil">{type}</p>
-          </div>
-          <div className="col-span-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-soil/50">
-              Member since
-            </p>
-            <p className="mt-1 font-serif text-lg font-semibold text-soil">
-              {memberSince}
-            </p>
-          </div>
+
+          {qrDataUrl && (
+            <div className="flex shrink-0 flex-col items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrDataUrl}
+                alt="Verification QR code"
+                className="h-24 w-24"
+                width={96}
+                height={96}
+              />
+              <p className="mt-1 text-[10px] text-soil/50">Scan to verify</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -152,12 +250,22 @@ export function MemberIdCard({ name, memberId, memberSince, type }: Props) {
         </button>
         <button
           type="button"
+          disabled={downloading}
           onClick={handleDownloadPng}
-          className="rounded-full bg-saffron px-6 py-3 text-sm font-semibold text-white transition hover:bg-saffron/90"
+          className="rounded-full bg-saffron px-6 py-3 text-sm font-semibold text-white transition hover:bg-saffron/90 disabled:opacity-60"
         >
-          Download PNG
+          {downloading ? "Preparing…" : "Download PNG"}
         </button>
       </div>
+
+      {verifyUrl && (
+        <p className="no-print mt-3 text-center text-xs text-soil/60">
+          Verify this ID at{" "}
+          <a href={verifyUrl} className="font-semibold text-green hover:underline">
+            {SITE.name}/verify
+          </a>
+        </p>
+      )}
 
       {downloadError && (
         <p className="no-print mt-3 text-center text-sm text-red-600">

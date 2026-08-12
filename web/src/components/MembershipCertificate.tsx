@@ -8,6 +8,10 @@ type Props = {
   referenceNumber: string;
   issueDate: string;
   standingLabel?: string | null;
+  statusLabel?: string;
+  isActive?: boolean;
+  qrDataUrl?: string;
+  verifyUrl?: string;
 };
 
 function drawWrappedText(
@@ -39,7 +43,49 @@ function drawWrappedText(
   return cursorY;
 }
 
-function buildCertificatePng(props: Props): string {
+async function loadImage(src: string): Promise<HTMLImageElement> {
+  const img = new Image();
+  img.src = src;
+  if (typeof img.decode === "function") {
+    await img.decode();
+  } else {
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("QR image failed to load"));
+    });
+  }
+  return img;
+}
+
+function drawStatusPill(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  centerX: number,
+  y: number,
+  isActive: boolean
+) {
+  ctx.font = "bold 22px Georgia, serif";
+  const paddingX = 24;
+  const textWidth = ctx.measureText(text).width;
+  const w = textWidth + paddingX * 2;
+  const h = 44;
+  const x = centerX - w / 2;
+  ctx.fillStyle = isActive ? "#2d6a4f" : "#f0dcae";
+  if (typeof ctx.roundRect === "function") {
+    ctx.beginPath();
+    ctx.roundRect(x, y - h / 2, w, h, 22);
+    ctx.fill();
+  } else {
+    ctx.fillRect(x, y - h / 2, w, h);
+  }
+  ctx.fillStyle = isActive ? "#faf7f2" : "#7a5a1f";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, centerX, y + 1);
+  ctx.textBaseline = "alphabetic";
+}
+
+async function buildCertificatePng(props: Props): Promise<string> {
   const width = 1080;
   const height = 1350;
   const canvas = document.createElement("canvas");
@@ -52,6 +98,7 @@ function buildCertificatePng(props: Props): string {
   const green = "#2d6a4f";
   const gold = "#d4a853";
   const soil = "#3d2b1f";
+  const terracotta = "#c4704a";
 
   ctx.fillStyle = cream;
   ctx.fillRect(0, 0, width, height);
@@ -68,56 +115,74 @@ function buildCertificatePng(props: Props): string {
 
   ctx.fillStyle = green;
   ctx.font = "600 30px Georgia, serif";
-  ctx.fillText(SITE.legalName.toUpperCase(), centerX, 170);
+  ctx.fillText(SITE.legalName.toUpperCase(), centerX, 160);
 
   ctx.fillStyle = gold;
   ctx.font = "22px Georgia, serif";
-  ctx.fillText("FOUNDING MEMBERSHIP CERTIFICATE", centerX, 215);
+  ctx.fillText("FOUNDING MEMBERSHIP CERTIFICATE", centerX, 205);
 
   ctx.fillStyle = soil;
-  ctx.font = "bold 58px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.title, centerX, 320, width - 260, 66);
+  ctx.font = "bold 56px Georgia, serif";
+  drawWrappedText(ctx, CERTIFICATE.title, centerX, 300, width - 260, 62);
 
   ctx.fillStyle = soil;
   ctx.font = "italic 26px Georgia, serif";
-  ctx.fillText("This certifies that", centerX, 470);
-
-  const terracotta = "#c4704a";
+  ctx.fillText("This certifies that", centerX, 440);
 
   ctx.fillStyle = green;
-  ctx.font = "bold 64px Georgia, serif";
-  ctx.fillText(props.name, centerX, 555);
+  ctx.font = "bold 62px Georgia, serif";
+  ctx.fillText(props.name, centerX, 520);
 
   ctx.strokeStyle = gold;
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(centerX - 260, 585);
-  ctx.lineTo(centerX + 260, 585);
+  ctx.moveTo(centerX - 260, 550);
+  ctx.lineTo(centerX + 260, 550);
   ctx.stroke();
 
   if (props.standingLabel) {
     ctx.fillStyle = terracotta;
-    ctx.font = "bold 34px Georgia, serif";
-    ctx.fillText(props.standingLabel, centerX, 640);
+    ctx.font = "bold 32px Georgia, serif";
+    ctx.fillText(props.standingLabel, centerX, 600);
   }
 
   ctx.fillStyle = soil;
-  ctx.font = "30px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.body, centerX, 710, width - 300, 42);
+  ctx.font = "28px Georgia, serif";
+  drawWrappedText(ctx, CERTIFICATE.body, centerX, 660, width - 320, 40);
 
   ctx.fillStyle = green;
-  ctx.font = "italic 28px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.tagline, centerX, 830, width - 300, 40);
+  ctx.font = "italic 26px Georgia, serif";
+  drawWrappedText(ctx, CERTIFICATE.tagline, centerX, 760, width - 320, 38);
 
   ctx.fillStyle = soil;
-  ctx.font = "bold 26px Georgia, serif";
-  ctx.fillText(`Reference: ${props.referenceNumber}`, centerX, 960);
-  ctx.font = "26px Georgia, serif";
-  ctx.fillText(`Issued: ${props.issueDate}`, centerX, 1005);
+  ctx.font = "bold 24px Georgia, serif";
+  ctx.fillText(`Reference: ${props.referenceNumber}`, centerX, 862);
+  ctx.font = "22px Georgia, serif";
+  ctx.fillText(`Issued: ${props.issueDate}`, centerX, 898);
 
-  ctx.fillStyle = "#8a7a68";
-  ctx.font = "20px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.note, centerX, 1150, width - 320, 28);
+  if (props.statusLabel) {
+    drawStatusPill(
+      ctx,
+      props.statusLabel.toUpperCase(),
+      centerX,
+      948,
+      Boolean(props.isActive)
+    );
+  }
+
+  if (props.qrDataUrl) {
+    try {
+      const qr = await loadImage(props.qrDataUrl);
+      const qrSize = 150;
+      ctx.drawImage(qr, centerX - qrSize / 2, 1000, qrSize, qrSize);
+      ctx.fillStyle = "#8a7a68";
+      ctx.font = "18px Georgia, serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Scan to verify authenticity", centerX, 1180);
+    } catch {
+      // QR is best-effort; skip if it fails to load.
+    }
+  }
 
   return canvas.toDataURL("image/png");
 }
@@ -127,22 +192,31 @@ export function MembershipCertificate({
   referenceNumber,
   issueDate,
   standingLabel,
+  statusLabel,
+  isActive,
+  qrDataUrl,
+  verifyUrl,
 }: Props) {
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   function handlePrint() {
     document.body.classList.remove("printing-idcard");
     window.print();
   }
 
-  function handleDownloadPng() {
+  async function handleDownloadPng() {
     setDownloadError(null);
+    setDownloading(true);
     try {
-      const dataUrl = buildCertificatePng({
+      const dataUrl = await buildCertificatePng({
         name,
         referenceNumber,
         issueDate,
         standingLabel,
+        statusLabel,
+        isActive,
+        qrDataUrl,
       });
       const link = document.createElement("a");
       link.href = dataUrl;
@@ -155,6 +229,8 @@ export function MembershipCertificate({
       setDownloadError(
         "Couldn't generate the image. You can still use Print / Save as PDF."
       );
+    } finally {
+      setDownloading(false);
     }
   }
 
@@ -198,6 +274,34 @@ export function MembershipCertificate({
             <p>Issued: {issueDate}</p>
           </div>
 
+          {statusLabel && (
+            <span
+              className={`mt-5 inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ${
+                isActive
+                  ? "bg-green/15 text-green"
+                  : "bg-gold/20 text-[#7a5a1f]"
+              }`}
+            >
+              {statusLabel}
+            </span>
+          )}
+
+          {qrDataUrl && (
+            <div className="mt-6 flex flex-col items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrDataUrl}
+                alt="Verification QR code"
+                className="h-28 w-28"
+                width={112}
+                height={112}
+              />
+              <p className="mt-2 text-xs text-soil/50">
+                Scan to verify authenticity
+              </p>
+            </div>
+          )}
+
           <p className="mx-auto mt-6 max-w-sm text-xs text-soil/50">
             {CERTIFICATE.note}
           </p>
@@ -214,12 +318,22 @@ export function MembershipCertificate({
         </button>
         <button
           type="button"
+          disabled={downloading}
           onClick={handleDownloadPng}
-          className="rounded-full bg-saffron px-6 py-3 text-sm font-semibold text-white transition hover:bg-saffron/90"
+          className="rounded-full bg-saffron px-6 py-3 text-sm font-semibold text-white transition hover:bg-saffron/90 disabled:opacity-60"
         >
-          Download PNG
+          {downloading ? "Preparing…" : "Download PNG"}
         </button>
       </div>
+
+      {verifyUrl && (
+        <p className="no-print mt-3 text-center text-xs text-soil/60">
+          Verify this certificate at{" "}
+          <a href={verifyUrl} className="font-semibold text-green hover:underline">
+            {SITE.name}/verify
+          </a>
+        </p>
+      )}
 
       {downloadError && (
         <p className="no-print mt-3 text-center text-sm text-red-600">
