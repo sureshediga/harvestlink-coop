@@ -6,15 +6,10 @@ import {
   listApplications,
 } from "@/lib/applications";
 import { createMember } from "@/lib/members";
-
-function isAuthorized(request: Request): boolean {
-  const adminKey = process.env.ADMIN_EXPORT_KEY;
-  const authHeader = request.headers.get("authorization");
-  return Boolean(adminKey && authHeader === `Bearer ${adminKey}`);
-}
+import { getAdminEmail, isAdminAuthorized } from "@/lib/admin-session";
 
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!(await isAdminAuthorized(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -44,7 +39,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!(await isAdminAuthorized(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -95,6 +90,11 @@ export async function POST(request: Request) {
     });
 
     await confirmApplication(referenceNumber);
+
+    const actor = (await getAdminEmail()) ?? "legacy-key";
+    console.log(
+      `[admin-audit] ${actor} confirmed ${application.referenceNumber} (member ${member.memberNumber})`
+    );
 
     return NextResponse.json({
       message: "Application confirmed and member created",

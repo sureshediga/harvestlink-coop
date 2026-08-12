@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { listMembers, membersToCsv } from "@/lib/members";
+import { isAdminAuthorized } from "@/lib/admin-session";
 
 export async function GET(request: Request) {
-  const adminKey = process.env.ADMIN_EXPORT_KEY;
-  const authHeader = request.headers.get("authorization");
-
-  if (!adminKey || authHeader !== `Bearer ${adminKey}`) {
+  if (!(await isAdminAuthorized(request))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
