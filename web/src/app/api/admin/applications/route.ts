@@ -28,6 +28,11 @@ export async function GET(request: Request) {
     kind: kind ?? undefined,
     status: status ?? undefined,
   });
+
+  if (searchParams.get("format") === "json") {
+    return NextResponse.json({ applications });
+  }
+
   const csv = applicationsToCsv(applications);
 
   return new NextResponse(csv, {
