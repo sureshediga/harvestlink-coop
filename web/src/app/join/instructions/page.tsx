@@ -2,83 +2,53 @@ import Link from "next/link";
 import { MemberIdCard } from "@/components/MemberIdCard";
 import { MembershipCertificate } from "@/components/MembershipCertificate";
 import { WaysToPay } from "@/components/WaysToPay";
-import {
-  applicationMemberId,
-  applicationStandingLabel,
-  applicationTypeLabel,
-  getApplicationByReference,
-} from "@/lib/applications";
+import { getApplicationByReference } from "@/lib/applications";
+import { buildCredentialView } from "@/lib/credential";
+import { verifyAccessToken } from "@/lib/verify";
 
 export const metadata = {
   title: "Payment Instructions",
 };
 
+function NotFound() {
+  return (
+    <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
+      <h1 className="font-serif text-3xl font-semibold text-soil">
+        Application not found
+      </h1>
+      <p className="mt-4 text-soil/70">
+        We couldn&apos;t find your application. Please use the link from your
+        submission, or start the join process again.
+      </p>
+      <Link href="/join" className="mt-8 inline-block text-green hover:underline">
+        Start membership application
+      </Link>
+    </div>
+  );
+}
+
 export default async function InstructionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string }>;
+  searchParams: Promise<{ ref?: string; t?: string }>;
 }) {
   const params = await searchParams;
   const referenceNumber = params.ref;
 
-  if (!referenceNumber) {
-    return (
-      <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
-        <h1 className="font-serif text-3xl font-semibold text-soil">
-          Application not found
-        </h1>
-        <p className="mt-4 text-soil/70">
-          We couldn&apos;t find your application reference. Please start the join
-          process again.
-        </p>
-        <Link href="/join" className="mt-8 inline-block text-green hover:underline">
-          Start membership application
-        </Link>
-      </div>
-    );
+  // Require the unguessable access token so the (sequential) reference number
+  // can't be enumerated to view other applicants' details.
+  if (!referenceNumber || !verifyAccessToken(referenceNumber, params.t)) {
+    return <NotFound />;
   }
 
   const application = await getApplicationByReference(referenceNumber);
 
   if (!application || application.kind !== "membership") {
-    return (
-      <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
-        <h1 className="font-serif text-3xl font-semibold text-soil">
-          Application not found
-        </h1>
-        <p className="mt-4 text-soil/70">
-          No application matches reference{" "}
-          <strong>{referenceNumber}</strong>.
-        </p>
-        <Link href="/join" className="mt-8 inline-block text-green hover:underline">
-          Start membership application
-        </Link>
-      </div>
-    );
+    return <NotFound />;
   }
 
   const totalDollars = application.totalAmount / 100;
-
-  const certificateName =
-    application.acknowledgements?.enrollmentDisclosure.signedName ??
-    application.fullName;
-  const issueDate = new Date(application.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-  const standingLabel = applicationStandingLabel(
-    application.referenceNumber,
-    "membership"
-  );
-  const memberId = applicationMemberId(application.referenceNumber, "membership");
-  const memberSince = new Date(application.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    timeZone: "UTC",
-  });
-  const memberType = applicationTypeLabel("membership");
+  const credential = await buildCredentialView(application);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -92,7 +62,7 @@ export default async function InstructionsPage({
         <p className="mt-3 text-soil/75">
           Thank you, {application.fullName.split(" ")[0]}. Use the instructions
           below to pay via Zelle. We&apos;ll activate your founding membership
-          membership within 1–2 business days after payment is received.
+          within 1–2 business days after payment is received.
         </p>
       </div>
 
@@ -102,10 +72,14 @@ export default async function InstructionsPage({
         </h2>
         <div className="mt-4">
           <MembershipCertificate
-            name={certificateName}
+            name={credential.name}
             referenceNumber={application.referenceNumber}
-            issueDate={issueDate}
-            standingLabel={standingLabel}
+            issueDate={credential.issueDate}
+            standingLabel={credential.standingLabel}
+            statusLabel={credential.statusLabel}
+            isActive={credential.isActive}
+            qrDataUrl={credential.qrDataUrl}
+            verifyUrl={credential.verifyUrl}
           />
         </div>
       </div>
@@ -116,10 +90,14 @@ export default async function InstructionsPage({
         </h2>
         <div className="mt-4">
           <MemberIdCard
-            name={certificateName}
-            memberId={memberId}
-            memberSince={memberSince}
-            type={memberType}
+            name={credential.name}
+            memberId={credential.memberId}
+            memberSince={credential.memberSince}
+            type={credential.type}
+            statusLabel={credential.statusLabel}
+            isActive={credential.isActive}
+            qrDataUrl={credential.qrDataUrl}
+            verifyUrl={credential.verifyUrl}
           />
         </div>
       </div>

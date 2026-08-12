@@ -37,6 +37,7 @@ Copy `.env.example` to `.env.local` and configure:
 | `SUPABASE_URL` | **Required on Netlify** | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Required on Netlify** | Supabase service role key |
 | `ADMIN_EXPORT_KEY` | Optional | Bearer token for CSV export |
+| `CERT_SIGNING_SECRET` | Recommended | HMAC secret signing certificate/ID verification codes and the instructions-page access tokens. Set a long random string in production; a dev fallback is used if unset. |
 
 Without Supabase, records are stored in `data/*.json` (local dev only — not persisted on Netlify).
 

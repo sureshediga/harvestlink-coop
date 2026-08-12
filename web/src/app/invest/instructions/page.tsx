@@ -2,57 +2,50 @@ import Link from "next/link";
 import { MemberIdCard } from "@/components/MemberIdCard";
 import { MembershipCertificate } from "@/components/MembershipCertificate";
 import { WaysToPay } from "@/components/WaysToPay";
-import {
-  applicationMemberId,
-  applicationStandingLabel,
-  applicationTypeLabel,
-  getApplicationByReference,
-} from "@/lib/applications";
+import { getApplicationByReference } from "@/lib/applications";
+import { buildCredentialView } from "@/lib/credential";
+import { verifyAccessToken } from "@/lib/verify";
 
 export const metadata = {
   title: "Investment Payment Instructions",
 };
 
+function NotFound() {
+  return (
+    <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
+      <h1 className="font-serif text-3xl font-semibold text-soil">
+        Application not found
+      </h1>
+      <p className="mt-4 text-soil/70">
+        We couldn&apos;t find your application. Please use the link from your
+        submission, or start the investment process again.
+      </p>
+      <Link href="/invest" className="mt-8 inline-block text-green hover:underline">
+        Start investment application
+      </Link>
+    </div>
+  );
+}
+
 export default async function InvestInstructionsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string }>;
+  searchParams: Promise<{ ref?: string; t?: string }>;
 }) {
   const params = await searchParams;
-  const application = params.ref
-    ? await getApplicationByReference(params.ref)
-    : null;
+  const referenceNumber = params.ref;
 
-  if (!application || application.kind !== "investment") {
-    return (
-      <div className="mx-auto max-w-xl px-4 py-20 text-center sm:px-6">
-        <h1 className="font-serif text-3xl font-semibold text-soil">
-          Application not found
-        </h1>
-        <Link href="/invest" className="mt-8 inline-block text-green hover:underline">
-          Start investment application
-        </Link>
-      </div>
-    );
+  if (!referenceNumber || !verifyAccessToken(referenceNumber, params.t)) {
+    return <NotFound />;
   }
 
-  const issueDate = new Date(application.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-  const standingLabel = applicationStandingLabel(
-    application.referenceNumber,
-    "investment"
-  );
-  const memberId = applicationMemberId(application.referenceNumber, "investment");
-  const memberSince = new Date(application.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    timeZone: "UTC",
-  });
-  const memberType = applicationTypeLabel("investment");
+  const application = await getApplicationByReference(referenceNumber);
+
+  if (!application || application.kind !== "investment") {
+    return <NotFound />;
+  }
+
+  const credential = await buildCredentialView(application);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -76,10 +69,14 @@ export default async function InvestInstructionsPage({
         </h2>
         <div className="mt-4">
           <MembershipCertificate
-            name={application.fullName}
+            name={credential.name}
             referenceNumber={application.referenceNumber}
-            issueDate={issueDate}
-            standingLabel={standingLabel}
+            issueDate={credential.issueDate}
+            standingLabel={credential.standingLabel}
+            statusLabel={credential.statusLabel}
+            isActive={credential.isActive}
+            qrDataUrl={credential.qrDataUrl}
+            verifyUrl={credential.verifyUrl}
           />
         </div>
       </div>
@@ -90,10 +87,14 @@ export default async function InvestInstructionsPage({
         </h2>
         <div className="mt-4">
           <MemberIdCard
-            name={application.fullName}
-            memberId={memberId}
-            memberSince={memberSince}
-            type={memberType}
+            name={credential.name}
+            memberId={credential.memberId}
+            memberSince={credential.memberSince}
+            type={credential.type}
+            statusLabel={credential.statusLabel}
+            isActive={credential.isActive}
+            qrDataUrl={credential.qrDataUrl}
+            verifyUrl={credential.verifyUrl}
           />
         </div>
       </div>
