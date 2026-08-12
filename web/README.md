@@ -36,7 +36,7 @@ Copy `.env.example` to `.env.local` and configure:
 | `NEXT_PUBLIC_SITE_URL` | Recommended | Production site URL (Netlify sets `URL` automatically for API routes) |
 | `SUPABASE_URL` | **Required on Netlify** | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Required on Netlify** | Supabase service role key |
-| `ADMIN_EXPORT_KEY` | Optional | Bearer token for CSV export |
+| `ADMIN_EXPORT_KEY` | Optional | Bearer token for CSV export APIs; also the one-time **setup key** used to create the first admin account at `/admin/setup` |
 | `CERT_SIGNING_SECRET` | Recommended | HMAC secret signing certificate/ID verification codes and the instructions-page access tokens. Set a long random string in production; a dev fallback is used if unset. |
 
 Without Supabase, records are stored in `data/*.json` (local dev only — not persisted on Netlify).
@@ -94,6 +94,16 @@ Recommended setup:
 5. After deploy, submit again. If it still fails, open browser DevTools → Network → click the failed `manual` request and read the JSON `error` message.
 
 A **501** usually means the Next.js runtime did not handle the API route — confirm build logs show `Using Next.js Runtime - v5` and that `@netlify/plugin-nextjs` is installed.
+
+## Admin dashboard (`/admin`)
+
+The `/admin` dashboard uses per-user login (email + password), with hashed passwords and a signed HttpOnly session cookie.
+
+1. First-time setup: go to `/admin/setup`, enter the **setup key** (your `ADMIN_EXPORT_KEY`) plus the email + password for the first admin. Setup is only available while no admin accounts exist.
+2. Sign in at `/admin/login`. Manage additional admins at `/admin/admins`.
+3. If using Supabase, run `supabase/migration-admins.sql` to create the `admins` table (otherwise admins persist via Netlify Blobs / local JSON like other records).
+
+The CSV export APIs still accept `Authorization: Bearer <ADMIN_EXPORT_KEY>` for programmatic use, in addition to a logged-in admin session.
 
 ## Admin: Pending Applications
 
