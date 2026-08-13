@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createApplication } from "@/lib/applications";
+import { createApplication, DuplicateSignupError } from "@/lib/applications";
 import { publicApiErrorMessage } from "@/lib/api-errors";
 import { membershipCheckoutSchema } from "@/lib/schemas";
 import { signAccessToken } from "@/lib/verify";
@@ -36,6 +36,9 @@ export async function POST(request: Request) {
       accessToken: signAccessToken(application.referenceNumber),
     });
   } catch (error) {
+    if (error instanceof DuplicateSignupError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
     console.error("Manual membership application error:", error);
     return NextResponse.json(
       { error: publicApiErrorMessage(error) },

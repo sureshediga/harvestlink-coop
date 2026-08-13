@@ -146,6 +146,16 @@ export async function getMemberByPayPalOrderId(
   return members.find((m) => m.paypalOrderId === orderId) ?? null;
 }
 
+export async function getMemberByEmail(
+  email: string
+): Promise<MemberRecord | null> {
+  const normalized = email.trim().toLowerCase();
+  const members = await listMembers();
+  return (
+    members.find((m) => m.email.trim().toLowerCase() === normalized) ?? null
+  );
+}
+
 export async function createMember(
   input: CreateMemberInput
 ): Promise<MemberRecord> {
