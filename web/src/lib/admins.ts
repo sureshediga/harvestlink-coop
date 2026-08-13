@@ -48,6 +48,28 @@ export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
+/**
+ * True when the Supabase `admins` table doesn't exist yet (migration not run).
+ * In that case we transparently use the Netlify Blobs / local fallback so admin
+ * login works out of the box without a manual SQL migration.
+ */
+function isMissingAdminsTable(error: unknown): boolean {
+  const err = error as { code?: string; message?: string } | null;
+  const code = err?.code ?? "";
+  const message = (err?.message ?? String(error ?? "")).toLowerCase();
+  return (
+    code === "42P01" || // postgres: undefined_table
+    code === "PGRST205" || // postgrest: table not found in schema cache
+    message.includes("could not find the table") ||
+    (message.includes("relation") && message.includes("does not exist")) ||
+    (message.includes("admins") && message.includes("does not exist"))
+  );
+}
+
+function shouldFallback(error: unknown): boolean {
+  return isStorageUnreachable(error) || isMissingAdminsTable(error);
+}
+
 function toPublic(admin: AdminRecord): PublicAdmin {
   return {
     id: admin.id,
@@ -105,12 +127,12 @@ export async function listAdmins(): Promise<AdminRecord[]> {
         .select("*")
         .order("created_at", { ascending: true });
       if (error) {
-        if (isStorageUnreachable(error)) return readFallback();
+        if (shouldFallback(error)) return readFallback();
         throw new Error(error.message);
       }
       return (data ?? []).map(mapFromDb);
     } catch (error) {
-      if (isStorageUnreachable(error)) return readFallback();
+      if (shouldFallback(error)) return readFallback();
       throw error instanceof Error ? error : new Error(String(error));
     }
   }
@@ -134,12 +156,12 @@ export async function getAdminByEmail(
         .eq("email", normalized)
         .maybeSingle();
       if (error) {
-        if (!isStorageUnreachable(error)) throw new Error(error.message);
+        if (!shouldFallback(error)) throw new Error(error.message);
       } else {
         return data ? mapFromDb(data) : null;
       }
     } catch (error) {
-      if (!isStorageUnreachable(error)) {
+      if (!shouldFallback(error)) {
         throw error instanceof Error ? error : new Error(String(error));
       }
     }
@@ -180,9 +202,9 @@ export async function createAdmin(input: {
         last_login_at: record.lastLoginAt,
       });
       if (!error) return toPublic(record);
-      if (!isStorageUnreachable(error)) throw new Error(error.message);
+      if (!shouldFallback(error)) throw new Error(error.message);
     } catch (error) {
-      if (!isStorageUnreachable(error)) {
+      if (!shouldFallback(error)) {
         throw error instanceof Error ? error : new Error(String(error));
       }
     }
@@ -205,9 +227,9 @@ export async function touchLastLogin(email: string): Promise<void> {
         .update({ last_login_at: now })
         .eq("email", normalized);
       if (!error) return;
-      if (!isStorageUnreachable(error)) throw new Error(error.message);
+      if (!shouldFallback(error)) throw new Error(error.message);
     } catch (error) {
-      if (!isStorageUnreachable(error)) return; // best-effort; don't block login
+      if (!shouldFallback(error)) return; // best-effort; don't block login
     }
   }
   const admins = await readFallback();
