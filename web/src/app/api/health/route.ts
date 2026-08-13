@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isStorageUnreachable, readBlobJson } from "@/lib/blob-store";
 import { getSupabase, isProductionHosting } from "@/lib/supabase";
+import { getSiteUrl } from "@/lib/site-url";
 
 /**
  * Lightweight production diagnostics for membership signup.
@@ -84,6 +85,9 @@ export async function GET() {
     hasUrl,
     hasServiceKey,
     supabaseKeyRole: keyRole,
+    // Base URL baked into certificate/ID QR codes. Should be the public site
+    // URL; if this is localhost, set NEXT_PUBLIC_SITE_URL in the environment.
+    siteUrl: getSiteUrl(),
     supabaseReachable,
     supabaseError,
     blobsAvailable,
