@@ -49,6 +49,8 @@ The repo includes `netlify.toml` at the project root with `base = "web"` and the
 
 Run `supabase/migration.sql` in your [Supabase](https://supabase.com) SQL editor. This creates `members` and `applications` tables.
 
+For security, also run `supabase/migration-rls.sql` (enables Row Level Security on `members`/`applications`) and `supabase/migration-admins.sql` (creates the `admins` table with RLS). RLS is enabled with no policies, which denies the public `anon`/`authenticated` keys; the app uses the service-role key and bypasses RLS.
+
 ### 2. Connect the site
 
 **Option A — Netlify UI**
