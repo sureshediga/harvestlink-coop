@@ -7,8 +7,42 @@ import {
   writeBlobJson,
 } from "./blob-store";
 import { INVESTOR, MEMBERSHIP } from "./constants";
+import { getMemberByEmail } from "./members";
 import type { MemberInfo, MembershipAcknowledgements } from "./schemas";
 import { getSupabase, isProductionHosting } from "./supabase";
+
+/** Thrown when someone tries to sign up for membership with an email already in use. */
+export class DuplicateSignupError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DuplicateSignupError";
+  }
+}
+
+/**
+ * Enforces one membership per email: rejects if the email already belongs to a
+ * confirmed member or an existing membership application. Investment signups are
+ * not restricted.
+ */
+export async function assertMembershipEmailAvailable(
+  email: string
+): Promise<void> {
+  const normalized = email.trim().toLowerCase();
+
+  const member = await getMemberByEmail(normalized);
+  if (member) {
+    throw new DuplicateSignupError(
+      "This email is already registered as a HarvestLinx member. If you need help, contact harvestlinx@gmail.com."
+    );
+  }
+
+  const memberships = await listApplications({ kind: "membership" });
+  if (memberships.some((a) => a.email.trim().toLowerCase() === normalized)) {
+    throw new DuplicateSignupError(
+      "An application already exists for this email. Please complete payment using the reference from your submission, or contact harvestlinx@gmail.com."
+    );
+  }
+}
 
 export type ApplicationKind = "membership" | "investment";
 
@@ -111,6 +145,10 @@ export async function createApplication(
     acknowledgements?: MembershipAcknowledgements;
   }
 ): Promise<PendingApplication> {
+  if (input.kind === "membership") {
+    await assertMembershipEmailAvailable(input.email);
+  }
+
   const referenceNumber = await generateReferenceNumber(input.kind);
   const investmentUnits =
     input.kind === "investment" ? Math.max(input.investmentUnits ?? 1, 1) : 0;

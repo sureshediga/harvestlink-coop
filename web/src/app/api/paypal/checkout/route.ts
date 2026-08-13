@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import {
+  assertMembershipEmailAvailable,
+  DuplicateSignupError,
+} from "@/lib/applications";
 import { membershipCheckoutSchema, memberInfoFromMembershipCheckout } from "@/lib/schemas";
 import { createPendingCheckout } from "@/lib/pending-checkout";
 import { createPayPalOrder, isPayPalConfigured } from "@/lib/paypal";
@@ -24,6 +28,7 @@ export async function POST(request: Request) {
 
     const data = parsed.data;
     const member = memberInfoFromMembershipCheckout(data);
+    await assertMembershipEmailAvailable(member.email);
     const pending = await createPendingCheckout({
       kind: "membership",
       investmentUnits: 0,
@@ -38,6 +43,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ url: approvalUrl });
   } catch (error) {
+    if (error instanceof DuplicateSignupError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
     console.error("PayPal checkout error:", error);
     return NextResponse.json(
       { error: "Unable to start PayPal checkout" },
