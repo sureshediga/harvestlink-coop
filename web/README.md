@@ -33,7 +33,7 @@ Copy `.env.example` to `.env.local` and configure:
 | `PAYPAL_CLIENT_ID` | For PayPal payments | PayPal REST app client ID |
 | `PAYPAL_CLIENT_SECRET` | For PayPal payments | PayPal REST app secret |
 | `PAYPAL_MODE` | For PayPal | `sandbox` or `live` |
-| `NEXT_PUBLIC_SITE_URL` | Recommended | Production site URL (Netlify sets `URL` automatically for API routes) |
+| `NEXT_PUBLIC_SITE_URL` | Recommended | Public site URL used to build certificate/ID **QR verify links** and payment redirects. Use **no trailing slash** (e.g. `https://your-site.netlify.app`). Netlify's `URL` is used as a fallback. |
 | `SUPABASE_URL` | **Required on Netlify** | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Required on Netlify** | Supabase service role key |
 | `ADMIN_EXPORT_KEY` | Optional | Bearer token for CSV export APIs; also the one-time **setup key** used to create the first admin account at `/admin/setup` |
@@ -130,6 +130,13 @@ curl -X POST http://localhost:3000/api/admin/applications \
 curl -H "Authorization: Bearer YOUR_ADMIN_EXPORT_KEY" \
   http://localhost:3000/api/admin/export -o members.csv
 ```
+
+## Certificates & QR codes
+
+Membership certificates and member ID cards include a QR code linking to `/verify?c=<signed code>`. The QR's base URL comes from `getSiteUrl()` (`NEXT_PUBLIC_SITE_URL` → Netlify `URL` → localhost).
+
+- Keep `NEXT_PUBLIC_SITE_URL` **without a trailing slash**. `getSiteUrl()` strips trailing slashes defensively, but a clean value avoids surprises. (A trailing slash previously produced a `//verify` double-slash that broke QR scans.)
+- The QR is rendered into the certificate/ID at the moment it's viewed/downloaded. **Downloaded PNGs and printed PDFs do not auto-update** — if the site URL changes, previously downloaded artifacts keep the old link and must be re-generated (re-open the instructions page and re-download).
 
 ## Design Spec
 
