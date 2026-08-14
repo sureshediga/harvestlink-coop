@@ -56,7 +56,11 @@ export default async function WelcomePage({
   const totalPaid = member.membershipAmount / 100;
 
   const paymentLabel =
-    member.paymentProvider === "manual" ? "Zelle" : "Online payment";
+    member.paymentProvider === "manual"
+      ? "Zelle"
+      : member.paymentProvider === "paypal"
+        ? "PayPal"
+        : "Card (Stripe)";
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6">

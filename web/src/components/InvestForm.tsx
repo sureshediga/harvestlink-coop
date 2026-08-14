@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import {
+  PaymentChoices,
+  type PaymentProviderChoice,
+} from "./PaymentChoices";
 import { StepIndicator } from "./StepIndicator";
 import { INVESTMENT_TERMS, INVESTOR } from "@/lib/constants";
 import { memberInfoSchema, type MemberInfo } from "@/lib/schemas";
@@ -17,7 +21,8 @@ export function InvestForm() {
   const [memberNumber, setMemberNumber] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<"manual" | null>(null);
+  const [loadingProvider, setLoadingProvider] =
+    useState<PaymentProviderChoice | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<MemberInfo>({
@@ -51,11 +56,25 @@ export function InvestForm() {
     setError(null);
   }
 
-  async function submitManual() {
+  function investmentPayload() {
+    return {
+      ...form.getValues(),
+      investmentUnits,
+      memberNumber: memberNumber || undefined,
+      agreedToTerms: true as const,
+    };
+  }
+
+  function ensureReadyToPay(): boolean {
     if (!agreedToTerms) {
       setError("Please agree to the investment terms to continue.");
-      return;
+      return false;
     }
+    return true;
+  }
+
+  async function submitManual() {
+    if (!ensureReadyToPay()) return;
     setLoading(true);
     setLoadingProvider("manual");
     setError(null);
@@ -63,12 +82,7 @@ export function InvestForm() {
       const response = await fetch("/api/invest/applications/manual", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form.getValues(),
-          investmentUnits,
-          memberNumber: memberNumber || undefined,
-          agreedToTerms: true,
-        }),
+        body: JSON.stringify(investmentPayload()),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Unable to submit");
@@ -76,6 +90,32 @@ export function InvestForm() {
         ? `&t=${encodeURIComponent(data.accessToken)}`
         : "";
       window.location.href = `/invest/instructions?ref=${encodeURIComponent(data.referenceNumber)}${tokenParam}`;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setLoading(false);
+      setLoadingProvider(null);
+    }
+  }
+
+  async function submitOnlineCheckout(provider: "paypal" | "stripe") {
+    if (!ensureReadyToPay()) return;
+    setLoading(true);
+    setLoadingProvider(provider);
+    setError(null);
+    const path =
+      provider === "paypal"
+        ? "/api/invest/paypal/checkout"
+        : "/api/invest/checkout";
+    try {
+      const response = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(investmentPayload()),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Unable to start checkout");
+      if (!data.url) throw new Error("Checkout did not return a payment URL");
+      window.location.href = data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
@@ -242,23 +282,18 @@ export function InvestForm() {
             <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
           )}
 
-          <div className="mt-6">
-            <p className="text-sm font-semibold text-green">Pay with Zelle</p>
-            <p className="mt-1 text-xs text-soil/50">
-              Submit your application to receive payment instructions and a
-              reference number.
-            </p>
-            <button
-              type="button"
-              disabled={loading}
-              onClick={submitManual}
-              className="mt-4 w-full rounded-full bg-saffron py-3.5 font-semibold text-white transition hover:bg-saffron/90 disabled:opacity-60"
-            >
-              {loadingProvider === "manual"
-                ? "Submitting..."
-                : `Submit investment — pay $${(totalCents / 100).toFixed(0)} via Zelle`}
-            </button>
-          </div>
+          <PaymentChoices
+            amountDollars={totalCents / 100}
+            loading={loading}
+            loadingProvider={loadingProvider}
+            onZelle={submitManual}
+            onPayPal={() => submitOnlineCheckout("paypal")}
+            onStripe={() => submitOnlineCheckout("stripe")}
+            zelleActionLabel={`Submit investment — pay $${(totalCents / 100).toFixed(0)} via Zelle`}
+            zelleNote="Submit your application to receive payment instructions and a reference number. Investment is recorded after we confirm payment."
+            paypalNote="Pay now with PayPal or a linked card. Your investment is recorded as soon as PayPal confirms the payment."
+            stripeNote="Pay now with a debit or credit card via Stripe. Your investment is recorded after Stripe confirms the payment."
+          />
 
           <button type="button" onClick={() => setStep(2)} className="mt-6 text-sm font-medium text-soil/60 hover:text-soil">
             ← Back

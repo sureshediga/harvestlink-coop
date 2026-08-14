@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { isPayPalConfigured } from "@/lib/paypal";
+import { isStripeConfigured } from "@/lib/stripe";
 import { isStorageUnreachable, readBlobJson } from "@/lib/blob-store";
 import { getSupabase, isProductionHosting } from "@/lib/supabase";
 import { getSiteUrl } from "@/lib/site-url";
@@ -88,6 +90,8 @@ export async function GET() {
     // Base URL baked into certificate/ID QR codes. Should be the public site
     // URL; if this is localhost, set NEXT_PUBLIC_SITE_URL in the environment.
     siteUrl: getSiteUrl(),
+    paypalConfigured: isPayPalConfigured(),
+    stripeConfigured: isStripeConfigured(),
     supabaseReachable,
     supabaseError,
     blobsAvailable,
