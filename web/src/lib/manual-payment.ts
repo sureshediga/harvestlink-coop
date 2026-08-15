@@ -1,4 +1,7 @@
 export const MANUAL_PAYMENT = {
+  // Zelle payments are sent to this email handle.
+  zelleHandle: "harvestlinx@gmail.com",
+  // Phone number used for calling to discuss investment / general contact.
   zellePhone: "614-961-9552",
   confirmationNote:
     "Include your application reference number in the Zelle memo.",
