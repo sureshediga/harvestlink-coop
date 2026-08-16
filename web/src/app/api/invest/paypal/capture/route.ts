@@ -71,6 +71,8 @@ export async function GET(request: Request) {
     console.error("PayPal invest capture: member lookup failed, continuing:", error);
   }
 
+  // capturePayPalOrder recovers already-captured orders (timeout/refresh).
+  // Only redirect to cancelled when PayPal confirms funds were not taken.
   let captured: { pendingId: string; captureId: string };
   try {
     captured = await capturePayPalOrder(orderId);

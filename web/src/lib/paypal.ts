@@ -20,7 +20,7 @@ type PayPalOrderResponse = {
   purchase_units?: Array<{
     custom_id?: string;
     payments?: {
-      captures?: Array<{ id: string }>;
+      captures?: Array<{ id: string; status?: string }>;
     };
   }>;
 };
@@ -164,6 +164,51 @@ export async function createPayPalOrder(input: {
   return { orderId: order.id, approvalUrl };
 }
 
+function extractCapturedPayment(order: PayPalOrderResponse): {
+  pendingId: string;
+  captureId: string;
+} | null {
+  const pendingId = order.purchase_units?.[0]?.custom_id;
+  const captures = order.purchase_units?.[0]?.payments?.captures ?? [];
+  const completedCapture =
+    captures.find((capture) => capture.status === "COMPLETED") ??
+    (order.status === "COMPLETED" ? captures[0] : undefined);
+
+  if (!pendingId || !completedCapture?.id) {
+    return null;
+  }
+
+  return { pendingId, captureId: completedCapture.id };
+}
+
+async function getPayPalOrder(
+  orderId: string,
+  token: string
+): Promise<PayPalOrderResponse> {
+  const response = await fetch(
+    `${getPayPalBaseUrl()}/v2/checkout/orders/${orderId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error("PayPal get order failed:", errorBody);
+    throw new Error("Unable to load PayPal order");
+  }
+
+  return (await response.json()) as PayPalOrderResponse;
+}
+
+/**
+ * Captures an approved PayPal order. If PayPal already captured the funds
+ * (timeout, refresh, double-submit), recovers the capture from the order
+ * instead of treating it as a failed / unpaid checkout.
+ */
 export async function capturePayPalOrder(orderId: string): Promise<{
   pendingId: string;
   captureId: string;
@@ -181,19 +226,38 @@ export async function capturePayPalOrder(orderId: string): Promise<{
     }
   );
 
-  if (!response.ok) {
+  if (response.ok) {
+    const order = (await response.json()) as PayPalOrderResponse;
+    const captured = extractCapturedPayment(order);
+    if (captured) {
+      return captured;
+    }
+    console.error(
+      "PayPal capture response OK but payment details incomplete; attempting order recovery:",
+      orderId
+    );
+  } else {
     const errorBody = await response.text();
     console.error("PayPal capture failed:", errorBody);
-    throw new Error("Unable to capture PayPal payment");
   }
 
-  const order = (await response.json()) as PayPalOrderResponse;
-  const pendingId = order.purchase_units?.[0]?.custom_id;
-  const captureId = order.purchase_units?.[0]?.payments?.captures?.[0]?.id;
-
-  if (!pendingId || !captureId || order.status !== "COMPLETED") {
-    throw new Error("PayPal payment was not completed");
+  // Common after a successful capture whose response never reached us
+  // (function timeout, network drop, browser refresh on the return URL),
+  // or when the capture response shape is incomplete. Money may already
+  // be taken — recover from the order before treating as unpaid.
+  try {
+    const existing = await getPayPalOrder(orderId, token);
+    const recovered = extractCapturedPayment(existing);
+    if (recovered) {
+      console.warn(
+        "PayPal capture recovered from already-completed order:",
+        orderId
+      );
+      return recovered;
+    }
+  } catch (lookupError) {
+    console.error("PayPal order recovery lookup failed:", lookupError);
   }
 
-  return { pendingId, captureId };
+  throw new Error("Unable to capture PayPal payment");
 }

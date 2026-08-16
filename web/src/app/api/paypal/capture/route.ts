@@ -76,8 +76,8 @@ export async function GET(request: Request) {
     console.error("PayPal capture: member lookup failed, continuing:", error);
   }
 
-  // Capture the funds. A failure here means no money was taken, so the
-  // "cancelled" page is accurate.
+  // Capture the funds. capturePayPalOrder also recovers ORDER_ALREADY_CAPTURED
+  // (timeout/refresh). Only treat as unpaid when PayPal confirms no capture.
   let captured: { pendingId: string; captureId: string };
   try {
     captured = await capturePayPalOrder(orderId);
