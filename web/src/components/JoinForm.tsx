@@ -6,6 +6,10 @@ import {
   FormAcknowledgementRow,
 } from "./AcknowledgementModal";
 import { OtherMembershipNote } from "./OtherMembershipNote";
+import {
+  PaymentChoices,
+  type PaymentProviderChoice,
+} from "./PaymentChoices";
 import { StepIndicator } from "./StepIndicator";
 import { MEMBERSHIP, MEMBERSHIP_TERMS, PILLARS, INVESTOR } from "@/lib/constants";
 import {
@@ -31,7 +35,8 @@ export function JoinForm() {
     null
   );
   const [loading, setLoading] = useState(false);
-  const [loadingProvider, setLoadingProvider] = useState<"manual" | null>(null);
+  const [loadingProvider, setLoadingProvider] =
+    useState<PaymentProviderChoice | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const totalCents = MEMBERSHIP.joiningFee * 100;
@@ -49,34 +54,47 @@ export function JoinForm() {
     setError(null);
   }
 
-  async function submitManualApplication() {
+  function membershipPayload() {
+    if (!complianceAck || !enrollmentAck) {
+      return null;
+    }
+    return {
+      agreedToTerms: true as const,
+      acknowledgements: {
+        compliance: complianceAck,
+        enrollmentDisclosure: enrollmentAck,
+      },
+    };
+  }
+
+  function ensureReadyToPay(): boolean {
     if (!complianceAck || !enrollmentAck) {
       setError(
         "Please read and sign both the Compliance & Acknowledgement Form and the Membership Enrollment & Disclosure Form."
       );
-      return;
+      return false;
     }
-
     if (!agreedToTerms) {
       setError("Please agree to the membership terms to continue.");
-      return;
+      return false;
     }
+    return true;
+  }
+
+  async function submitManualApplication() {
+    if (!ensureReadyToPay()) return;
 
     setLoading(true);
     setLoadingProvider("manual");
     setError(null);
 
     try {
+      const payload = membershipPayload();
+      if (!payload) throw new Error("Application details are incomplete.");
       const response = await fetch("/api/applications/manual", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agreedToTerms: true,
-          acknowledgements: {
-            compliance: complianceAck,
-            enrollmentDisclosure: enrollmentAck,
-          },
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Unable to submit");
@@ -84,6 +102,35 @@ export function JoinForm() {
         ? `&t=${encodeURIComponent(data.accessToken)}`
         : "";
       window.location.href = `/join/instructions?ref=${encodeURIComponent(data.referenceNumber)}${tokenParam}`;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setLoading(false);
+      setLoadingProvider(null);
+    }
+  }
+
+  async function submitOnlineCheckout(provider: "paypal" | "stripe") {
+    if (!ensureReadyToPay()) return;
+
+    setLoading(true);
+    setLoadingProvider(provider);
+    setError(null);
+
+    const path =
+      provider === "paypal" ? "/api/paypal/checkout" : "/api/checkout";
+
+    try {
+      const payload = membershipPayload();
+      if (!payload) throw new Error("Application details are incomplete.");
+      const response = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? "Unable to start checkout");
+      if (!data.url) throw new Error("Checkout did not return a payment URL");
+      window.location.href = data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
@@ -202,23 +249,18 @@ export function JoinForm() {
             </p>
           )}
 
-          <div className="mt-6">
-            <p className="text-sm font-semibold text-green">Pay with Zelle</p>
-            <p className="mt-1 text-xs text-soil/50">
-              Submit your application to receive payment instructions and a
-              reference number.
-            </p>
-            <button
-              type="button"
-              disabled={loading}
-              onClick={submitManualApplication}
-              className="mt-4 w-full rounded-full bg-saffron py-3.5 font-semibold text-white transition hover:bg-saffron/90 disabled:opacity-60"
-            >
-              {loadingProvider === "manual"
-                ? "Submitting..."
-                : `Submit application — pay $${(totalCents / 100).toFixed(0)} via Zelle`}
-            </button>
-          </div>
+          <PaymentChoices
+            amountDollars={totalCents / 100}
+            loading={loading}
+            loadingProvider={loadingProvider}
+            onZelle={submitManualApplication}
+            onPayPal={() => submitOnlineCheckout("paypal")}
+            onStripe={() => submitOnlineCheckout("stripe")}
+            zelleActionLabel={`Submit application — pay $${(totalCents / 100).toFixed(0)} via Zelle`}
+            zelleNote="Submit your application to receive payment instructions and a reference number. Membership is activated after we confirm payment."
+            paypalNote="Pay now with PayPal or a linked card. Membership activates as soon as PayPal confirms the payment."
+            stripeNote="Pay now with a debit or credit card via Stripe. Membership activates after Stripe confirms the payment."
+          />
 
           <OtherMembershipNote className="mt-6 rounded-xl border border-gold/15 bg-cream/30 p-4 text-center" />
 

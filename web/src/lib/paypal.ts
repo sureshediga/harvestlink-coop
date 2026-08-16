@@ -1,5 +1,6 @@
 import type { ApplicationKind } from "./applications";
 import { INVESTOR, MEMBERSHIP } from "./constants";
+import { isRealSecret } from "./env-secret";
 import { getSiteUrl } from "./site-url";
 
 type PayPalTokenResponse = {
@@ -31,7 +32,10 @@ function getPayPalBaseUrl(): string {
 }
 
 export function isPayPalConfigured(): boolean {
-  return Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+  return (
+    isRealSecret(process.env.PAYPAL_CLIENT_ID) &&
+    isRealSecret(process.env.PAYPAL_CLIENT_SECRET)
+  );
 }
 
 async function getAccessToken(): Promise<string> {

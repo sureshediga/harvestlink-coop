@@ -88,8 +88,12 @@ export default function MembershipPage() {
         </ul>
       </Section>
 
-      <Section title="Pay with Zelle" className="bg-white">
+      <Section title="How to pay" className="bg-white">
         <WaysToPay />
+        <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-soil/70">
+          Prefer PayPal or a card? Those options appear on the membership
+          application when they are enabled.
+        </p>
         <div className="mt-8 text-center">
           <Link
             href="/join"

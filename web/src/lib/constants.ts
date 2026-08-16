@@ -312,7 +312,7 @@ export const FAQ_ITEMS = [
   {
     question: "How do I pay?",
     answer:
-      "Pay by Zelle to 614-961-9552. Submit your application online to receive a reference number — include it in the Zelle memo. Membership is activated within 1–2 business days after payment is received.",
+      "Zelle is always available: send payment to 614-961-9552 and include your application reference number in the memo. Membership is activated within 1–2 business days after we confirm receipt. You can also pay immediately with PayPal (or a card via Stripe) when those options appear on the join or invest form — those payments activate as soon as the provider confirms them.",
   },
   {
     question: "How does voting work?",

@@ -5,7 +5,7 @@ Consumer-friendly pre-launch site for **HarvestLinx Cooperative** — a member-o
 ## Features
 
 - Marketing pages (Home, How It Works, Farmers, Membership, Texas, Vision, FAQ)
-- Founding member signup via **Zelle** (614-961-9552)
+- Founding member signup via **Zelle** (614-961-9552). **PayPal** and **Stripe** appear on Join/Invest when their env vars are set.
 - Optional cooperative investment (multiples of $100)
 - Member and application storage (Supabase required on Netlify; local JSON for dev)
 - Admin CSV export of members
@@ -41,6 +41,24 @@ Copy `.env.example` to `.env.local` and configure:
 
 Without Supabase, records are stored in `data/*.json` (local dev only — not persisted on Netlify).
 
+### Enabling PayPal (alongside Zelle)
+
+Zelle stays available with no extra setup. To add **Pay with PayPal** on `/join`:
+
+1. Create a [PayPal Business](https://www.paypal.com/businessmanage/account/aboutBusiness) account and a REST app in the [Developer Dashboard](https://developer.paypal.com/dashboard/applications/live).
+2. Copy the **Live** Client ID and Secret.
+3. In Netlify → Environment variables (all deploy contexts), set:
+   - `PAYPAL_CLIENT_ID`
+   - `PAYPAL_CLIENT_SECRET`
+   - `PAYPAL_MODE` = `live`
+4. Redeploy. Confirm `GET /api/health` shows `paypalConfigured: true`, then `/join` will show a PayPal button next to Zelle.
+
+PayPal payments activate membership immediately after capture. Zelle applications stay pending until an admin marks them paid.
+
+### Enabling Stripe (card payments)
+
+Same pattern: set `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, and `STRIPE_WEBHOOK_SECRET` (webhook URL `{site}/api/webhooks/stripe`). A card button appears on `/join` when those keys are present.
+
 ## Deploy to Netlify
 
 The repo includes `netlify.toml` at the project root with `base = "web"` and the Netlify Next.js plugin.
@@ -63,6 +81,8 @@ For security, also run `supabase/migration-rls.sql` (enables Row Level Security 
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ADMIN_EXPORT_KEY` (secure random string for admin CSV/confirm API)
    - `NEXT_PUBLIC_SITE_URL` = your Netlify site URL (e.g. `https://your-site.netlify.app`)
+   - Optional PayPal: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_MODE=live`
+   - Optional Stripe: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
 5. Deploy.
 
 **Option B — Netlify CLI**
