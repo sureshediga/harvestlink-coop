@@ -33,10 +33,10 @@ export function WaysToPay({
           Zelle
         </p>
         <p className="mt-3 font-serif text-2xl font-semibold text-soil">
-          {MANUAL_PAYMENT.zellePhone}
+          {MANUAL_PAYMENT.zelleHandle}
         </p>
         <p className="mt-2 text-sm text-soil/75">
-          Open your bank app, choose Zelle, and send to this number.
+          Open your bank app, choose Zelle, and send to this email address.
         </p>
       </article>
 
@@ -64,7 +64,7 @@ export function WaysToPay({
         <ol className="mt-3 list-decimal space-y-2 pl-4 text-sm text-soil/75">
           <li>
             Open your bank app and send ${amount} via Zelle to{" "}
-            <strong>{MANUAL_PAYMENT.zellePhone}</strong>.
+            <strong>{MANUAL_PAYMENT.zelleHandle}</strong>.
           </li>
           <li>
             {referenceNumber

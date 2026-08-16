@@ -5,7 +5,7 @@ Consumer-friendly pre-launch site for **HarvestLinx Cooperative** — a member-o
 ## Features
 
 - Marketing pages (Home, How It Works, Farmers, Membership, Texas, Vision, FAQ)
-- Founding member signup via **Zelle** (614-961-9552). **PayPal** and **Stripe** appear on Join/Invest when their env vars are set.
+- Founding member signup via **Zelle** (harvestlinx@gmail.com). **PayPal** and **Stripe** appear on Join/Invest when their env vars are set.
 - Optional cooperative investment (multiples of $100)
 - Member and application storage (Supabase required on Netlify; local JSON for dev)
 - Admin CSV export of members
