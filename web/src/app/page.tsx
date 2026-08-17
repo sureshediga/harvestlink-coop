@@ -13,16 +13,84 @@ import {
   PILLARS,
   PRODUCT_LINES,
 } from "@/lib/constants";
-import { getMemberCountSafe } from "@/lib/members";
+import { listApplications } from "@/lib/applications";
+import { listMembers } from "@/lib/members";
 
-// Member count is read at request time so it stays current.
+// Founding membership count is read at request time so it stays current.
 export const dynamic = "force-dynamic";
 
+async function getFoundingMemberCountSafe(): Promise<number | null> {
+  try {
+    const [members, applications] = await Promise.all([
+      listMembers(),
+      listApplications({ kind: "membership" }),
+    ]);
+    const foundingMemberEmails = new Set([
+      ...members
+        .filter((member) => member.isFoundingMember)
+        .map((member) => member.email.trim().toLowerCase()),
+      ...applications.map((application) =>
+        application.email.trim().toLowerCase()
+      ),
+    ]);
+    return foundingMemberEmails.size;
+  } catch (error) {
+    console.error("Founding member count unavailable:", error);
+    return null;
+  }
+}
+
 export default async function HomePage() {
-  const memberCount = await getMemberCountSafe();
+  const memberCount = await getFoundingMemberCountSafe();
 
   return (
     <>
+      <section className="border-b border-gold/20 bg-white px-4 py-10 sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-2xl">
+          <div className="rounded-2xl border-2 border-green/30 p-8">
+            <h2 className="font-serif text-2xl font-semibold text-soil">
+              Membership — ${MEMBERSHIP.joiningFee}
+            </h2>
+
+            <div className="mt-6 rounded-xl bg-green/10 p-5 text-center">
+              {memberCount === null ? (
+                <p className="font-serif text-2xl font-semibold text-green">
+                  {MEMBER_COUNT.fallbackHeadline}
+                </p>
+              ) : (
+                <p>
+                  <span className="block font-serif text-5xl font-bold leading-none text-green">
+                    {memberCount.toLocaleString()}
+                  </span>
+                  <span className="mt-2 block text-sm font-semibold uppercase tracking-wide text-green/80">
+                    {MEMBER_COUNT.label}
+                  </span>
+                </p>
+              )}
+              <p className="mt-3 text-sm italic text-soil/70">
+                {MEMBER_COUNT.tagline}
+              </p>
+            </div>
+
+            <ul className="mt-6 space-y-2 text-sm text-soil/75">
+              {MEMBERSHIP.benefits.slice(0, 4).map((b) => (
+                <li key={b}>✓ {b}</li>
+              ))}
+            </ul>
+            <Link href="/membership" className="mt-6 inline-block text-sm font-semibold text-green hover:underline">
+              Full membership details →
+            </Link>
+            <Link
+              href="/join"
+              className="mt-4 block rounded-full bg-saffron px-6 py-3 text-center text-sm font-semibold text-white hover:bg-saffron/90"
+            >
+              Join Now
+            </Link>
+            <OtherMembershipNote className="mt-6 border-t border-gold/15 pt-6" />
+          </div>
+        </div>
+      </section>
+
       <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(212,168,83,0.15),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(45,106,79,0.12),transparent_50%)]" />
         <div className="relative mx-auto max-w-4xl text-center">
@@ -101,56 +169,9 @@ export default async function HomePage() {
               >
                 <h3 className="font-semibold text-soil">{product.name}</h3>
                 <p className="mt-1 text-xs font-medium text-green">{product.region}</p>
-                <p className="mt-2 text-sm text-terracotta">{product.price}</p>
                 <p className="mt-1 text-xs text-soil/60">{product.note}</p>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white px-4 py-16 sm:px-6">
-        <div className="mx-auto max-w-2xl">
-          <div className="rounded-2xl border-2 border-green/30 p-8">
-            <h2 className="font-serif text-2xl font-semibold text-soil">
-              Membership — ${MEMBERSHIP.joiningFee}
-            </h2>
-
-            <div className="mt-6 rounded-xl bg-green/10 p-5 text-center">
-              {memberCount === null ? (
-                <p className="font-serif text-2xl font-semibold text-green">
-                  {MEMBER_COUNT.fallbackHeadline}
-                </p>
-              ) : (
-                <p>
-                  <span className="block font-serif text-5xl font-bold leading-none text-green">
-                    {memberCount.toLocaleString()}
-                  </span>
-                  <span className="mt-2 block text-sm font-semibold uppercase tracking-wide text-green/80">
-                    {MEMBER_COUNT.label}
-                  </span>
-                </p>
-              )}
-              <p className="mt-3 text-sm italic text-soil/70">
-                {MEMBER_COUNT.tagline}
-              </p>
-            </div>
-
-            <ul className="mt-6 space-y-2 text-sm text-soil/75">
-              {MEMBERSHIP.benefits.slice(0, 4).map((b) => (
-                <li key={b}>✓ {b}</li>
-              ))}
-            </ul>
-            <Link href="/membership" className="mt-6 inline-block text-sm font-semibold text-green hover:underline">
-              Full membership details →
-            </Link>
-            <Link
-              href="/join"
-              className="mt-4 block rounded-full bg-saffron px-6 py-3 text-center text-sm font-semibold text-white hover:bg-saffron/90"
-            >
-              Join Now
-            </Link>
-            <OtherMembershipNote className="mt-6 border-t border-gold/15 pt-6" />
           </div>
         </div>
       </section>
