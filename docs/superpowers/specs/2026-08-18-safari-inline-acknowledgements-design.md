@@ -1,7 +1,7 @@
 # Safari-safe inline membership acknowledgements
 
 **Date:** 2026-08-18  
-**Status:** Draft — awaiting user review  
+**Status:** Approved for implementation planning  
 **Scope:** Replace membership acknowledgement popups on `/join` with expand-in-place panels
 
 ## Goal
