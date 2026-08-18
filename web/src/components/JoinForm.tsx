@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import {
-  AcknowledgementModal,
+  AcknowledgementPanel,
   FormAcknowledgementRow,
-} from "./AcknowledgementModal";
+} from "./AcknowledgementPanel";
 import { OtherMembershipNote } from "./OtherMembershipNote";
 import {
   PaymentChoices,
@@ -215,20 +215,51 @@ export function JoinForm() {
             <p className="text-sm font-semibold text-soil">
               Required acknowledgements
             </p>
-            <FormAcknowledgementRow
-              label="I have read and signed the HarvestLinx Member Compliance & Acknowledgement Form."
-              acknowledged={Boolean(complianceAck)}
-              signedName={complianceAck?.signedName}
-              signedDate={complianceAck?.signedDate}
-              onOpen={() => setOpenDisclaimer("compliance")}
-            />
-            <FormAcknowledgementRow
-              label="I have read and signed the HarvestLinx Membership Enrollment & Disclosure Form (includes your application details)."
-              acknowledged={Boolean(enrollmentAck)}
-              signedName={enrollmentAck?.signedName}
-              signedDate={enrollmentAck?.signedDate}
-              onOpen={() => setOpenDisclaimer("enrollmentDisclosure")}
-            />
+            <div>
+              <FormAcknowledgementRow
+                label="I have read and signed the HarvestLinx Member Compliance & Acknowledgement Form."
+                acknowledged={Boolean(complianceAck)}
+                signedName={complianceAck?.signedName}
+                signedDate={complianceAck?.signedDate}
+                onOpen={() => setOpenDisclaimer("compliance")}
+              />
+              {openDisclaimer === "compliance" && (
+                <AcknowledgementPanel
+                  disclaimer={MEMBERSHIP_DISCLAIMERS.compliance}
+                  defaultName={
+                    enrollmentAck?.signedName ?? complianceAck?.signedName
+                  }
+                  existingAcknowledgement={complianceAck}
+                  onCancel={() => setOpenDisclaimer(null)}
+                  onAcknowledge={(acknowledgement) =>
+                    handleAcknowledgement("compliance", acknowledgement)
+                  }
+                />
+              )}
+            </div>
+            <div>
+              <FormAcknowledgementRow
+                label="I have read and signed the HarvestLinx Membership Enrollment & Disclosure Form (includes your application details)."
+                acknowledged={Boolean(enrollmentAck)}
+                signedName={enrollmentAck?.signedName}
+                signedDate={enrollmentAck?.signedDate}
+                onOpen={() => setOpenDisclaimer("enrollmentDisclosure")}
+              />
+              {openDisclaimer === "enrollmentDisclosure" && (
+                <AcknowledgementPanel
+                  disclaimer={MEMBERSHIP_DISCLAIMERS.enrollmentDisclosure}
+                  collectApplicationInfo
+                  defaultName={
+                    enrollmentAck?.signedName ?? complianceAck?.signedName
+                  }
+                  existingAcknowledgement={enrollmentAck}
+                  onCancel={() => setOpenDisclaimer(null)}
+                  onAcknowledge={(acknowledgement) =>
+                    handleAcknowledgement("enrollmentDisclosure", acknowledgement)
+                  }
+                />
+              )}
+            </div>
           </div>
 
           <label className="mt-6 flex items-start gap-3">
@@ -272,21 +303,6 @@ export function JoinForm() {
             ← Back
           </button>
         </div>
-      )}
-
-      {openDisclaimer && (
-        <AcknowledgementModal
-          disclaimer={MEMBERSHIP_DISCLAIMERS[openDisclaimer]}
-          collectApplicationInfo={openDisclaimer === "enrollmentDisclosure"}
-          defaultName={enrollmentAck?.signedName ?? complianceAck?.signedName}
-          existingAcknowledgement={
-            openDisclaimer === "compliance" ? complianceAck : enrollmentAck
-          }
-          onClose={() => setOpenDisclaimer(null)}
-          onAcknowledge={(acknowledgement) =>
-            handleAcknowledgement(openDisclaimer, acknowledgement)
-          }
-        />
       )}
     </div>
   );
