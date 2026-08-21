@@ -126,7 +126,8 @@ A **501** usually means the Next.js runtime did not handle the API route — con
 The `/admin` dashboard uses per-user login (email + password), with hashed passwords and a signed HttpOnly session cookie.
 
 1. First-time setup: go to `/admin/setup`, enter the **setup key** (your `ADMIN_EXPORT_KEY`) plus the email + password for the first admin. Setup is only available while no admin accounts exist.
-2. Sign in at `/admin/login`. Manage additional admins at `/admin/admins`.
+2. Sign in at `/admin/login`. If you forget the password, use `/admin/forgot` — email a reset link, or set a new password with `ADMIN_EXPORT_KEY`.
+3. Manage additional admins at `/admin/admins`.
 3. If using Supabase, run `supabase/migration-admins.sql` to create the `admins` table (otherwise admins persist via Netlify Blobs / local JSON like other records).
 
 The CSV export APIs still accept `Authorization: Bearer <ADMIN_EXPORT_KEY>` for programmatic use, in addition to a logged-in admin session.

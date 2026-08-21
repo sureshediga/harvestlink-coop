@@ -249,6 +249,43 @@ export async function verifyAdminCredentials(
   return verifyPassword(password, admin.passwordHash) ? admin : null;
 }
 
+export async function updateAdminPassword(
+  email: string,
+  password: string
+): Promise<boolean> {
+  if (password.length < 8) {
+    throw new Error("Password must be at least 8 characters");
+  }
+
+  const normalized = normalizeEmail(email);
+  const passwordHash = hashPassword(password);
+  const supabase = getSupabase();
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("admins")
+        .update({ password_hash: passwordHash })
+        .eq("email", normalized)
+        .select("id")
+        .maybeSingle();
+      if (!error) return Boolean(data);
+      if (!shouldFallback(error)) throw new Error(error.message);
+    } catch (error) {
+      if (!shouldFallback(error)) {
+        throw error instanceof Error ? error : new Error(String(error));
+      }
+    }
+  }
+
+  const admins = await readFallback();
+  const idx = admins.findIndex((a) => a.email === normalized);
+  if (idx === -1) return false;
+  admins[idx] = { ...admins[idx], passwordHash };
+  await writeFallback(admins);
+  return true;
+}
+
 export async function listPublicAdmins(): Promise<PublicAdmin[]> {
   return (await listAdmins()).map(toPublic);
 }

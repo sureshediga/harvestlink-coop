@@ -80,6 +80,12 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
+        <p className="mt-4 text-center text-sm">
+          <Link href="/admin/forgot" className="font-semibold text-green hover:underline">
+            Forgot password?
+          </Link>
+        </p>
+
         {needsSetup && (
           <p className="mt-6 rounded-lg bg-gold/10 px-4 py-3 text-center text-sm text-soil/70">
             No admin accounts yet.{" "}
