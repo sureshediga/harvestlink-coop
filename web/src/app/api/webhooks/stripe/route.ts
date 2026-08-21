@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { INVESTOR, MEMBERSHIP } from "@/lib/constants";
 import { createMember, getMemberBySessionId } from "@/lib/members";
+import { sendCredentialEmail } from "@/lib/credential-email";
+import { credentialSourceFromMember } from "@/lib/credential";
 import { getStripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
     const membershipAmount =
       kind === "membership" ? MEMBERSHIP.joiningFee * 100 : 0;
 
-    await createMember({
+    const member = await createMember({
       fullName: metadata.fullName ?? "Unknown",
       email: metadata.email ?? session.customer_email ?? "unknown@example.com",
       phone: metadata.phone ?? "",
@@ -75,6 +77,8 @@ export async function POST(request: Request) {
       isFoundingMember: true,
       membershipPaid: kind === "membership",
     });
+
+    await sendCredentialEmail(credentialSourceFromMember(member, kind));
   }
 
   return NextResponse.json({ received: true });

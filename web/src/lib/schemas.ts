@@ -51,21 +51,25 @@ export const membershipCheckoutSchema = z.object({
   acknowledgements: membershipAcknowledgementsSchema,
 });
 
-export const investmentCheckoutSchema = memberInfoSchema.extend({
-  investmentUnits: z.number().int().min(1, "Minimum investment is 1 unit ($100)"),
+export const investmentCheckoutSchema = z.object({
+  investmentUnits: z
+    .number()
+    .int()
+    .min(1, "Minimum investment is 1 unit ($100)"),
   memberNumber: z.string().optional(),
   agreedToTerms: z.literal(true, {
     message: "You must agree to investment terms",
   }),
+  acknowledgements: membershipAcknowledgementsSchema,
 });
 
 export type MembershipCheckoutPayload = z.infer<typeof membershipCheckoutSchema>;
 export type InvestmentCheckoutPayload = z.infer<typeof investmentCheckoutSchema>;
 
-export function memberInfoFromMembershipCheckout(
-  data: MembershipCheckoutPayload
+export function memberInfoFromAcknowledgements(
+  acknowledgements: MembershipAcknowledgements
 ): MemberInfo {
-  const enrollment = data.acknowledgements.enrollmentDisclosure;
+  const enrollment = acknowledgements.enrollmentDisclosure;
   return {
     fullName: enrollment.signedName,
     email: enrollment.email,
@@ -75,6 +79,18 @@ export function memberInfoFromMembershipCheckout(
     state: enrollment.state,
     zip: enrollment.zip,
   };
+}
+
+export function memberInfoFromMembershipCheckout(
+  data: MembershipCheckoutPayload
+): MemberInfo {
+  return memberInfoFromAcknowledgements(data.acknowledgements);
+}
+
+export function memberInfoFromInvestmentCheckout(
+  data: InvestmentCheckoutPayload
+): MemberInfo {
+  return memberInfoFromAcknowledgements(data.acknowledgements);
 }
 
 // Backward-compatible alias

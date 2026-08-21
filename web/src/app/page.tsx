@@ -13,35 +13,13 @@ import {
   PILLARS,
   PRODUCT_LINES,
 } from "@/lib/constants";
-import { listApplications } from "@/lib/applications";
-import { listMembers } from "@/lib/members";
+import { getCommunityCountsSafe } from "@/lib/community-counts";
 
-// Founding membership count is read at request time so it stays current.
+// Founding membership and investor counts are read at request time so they stay current.
 export const dynamic = "force-dynamic";
 
-async function getFoundingMemberCountSafe(): Promise<number | null> {
-  try {
-    const [members, applications] = await Promise.all([
-      listMembers(),
-      listApplications({ kind: "membership" }),
-    ]);
-    const foundingMemberEmails = new Set([
-      ...members
-        .filter((member) => member.isFoundingMember)
-        .map((member) => member.email.trim().toLowerCase()),
-      ...applications.map((application) =>
-        application.email.trim().toLowerCase()
-      ),
-    ]);
-    return foundingMemberEmails.size;
-  } catch (error) {
-    console.error("Founding member count unavailable:", error);
-    return null;
-  }
-}
-
 export default async function HomePage() {
-  const memberCount = await getFoundingMemberCountSafe();
+  const counts = await getCommunityCountsSafe();
 
   return (
     <>
@@ -53,19 +31,29 @@ export default async function HomePage() {
             </h2>
 
             <div className="mt-6 rounded-xl bg-green/10 p-5 text-center">
-              {memberCount === null ? (
+              {counts === null ? (
                 <p className="font-serif text-2xl font-semibold text-green">
                   {MEMBER_COUNT.fallbackHeadline}
                 </p>
               ) : (
-                <p>
-                  <span className="block font-serif text-5xl font-bold leading-none text-green">
-                    {memberCount.toLocaleString()}
-                  </span>
-                  <span className="mt-2 block text-sm font-semibold uppercase tracking-wide text-green/80">
-                    {MEMBER_COUNT.label}
-                  </span>
-                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <p>
+                    <span className="block font-serif text-5xl font-bold leading-none text-green">
+                      {counts.members.toLocaleString()}
+                    </span>
+                    <span className="mt-2 block text-sm font-semibold uppercase tracking-wide text-green/80">
+                      {MEMBER_COUNT.label}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="block font-serif text-5xl font-bold leading-none text-green">
+                      {counts.investors.toLocaleString()}
+                    </span>
+                    <span className="mt-2 block text-sm font-semibold uppercase tracking-wide text-green/80">
+                      {MEMBER_COUNT.investorsLabel}
+                    </span>
+                  </p>
+                </div>
               )}
               <p className="mt-3 text-sm italic text-soil/70">
                 {MEMBER_COUNT.tagline}
@@ -77,15 +65,20 @@ export default async function HomePage() {
                 <li key={b}>✓ {b}</li>
               ))}
             </ul>
-            <Link href="/membership" className="mt-6 inline-block text-sm font-semibold text-green hover:underline">
-              Full membership details →
-            </Link>
-            <Link
-              href="/join"
-              className="mt-4 block rounded-full bg-saffron px-6 py-3 text-center text-sm font-semibold text-white hover:bg-saffron/90"
-            >
-              Join Now
-            </Link>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <Link
+                href="/join"
+                className="block rounded-full bg-saffron px-6 py-3 text-center text-sm font-semibold text-white hover:bg-saffron/90"
+              >
+                Join Now
+              </Link>
+              <Link
+                href="/invest"
+                className="block rounded-full border border-green/30 bg-white px-6 py-3 text-center text-sm font-semibold text-green hover:bg-green/5"
+              >
+                Invest
+              </Link>
+            </div>
             <OtherMembershipNote className="mt-6 border-t border-gold/15 pt-6" />
           </div>
         </div>
@@ -105,12 +98,18 @@ export default async function HomePage() {
             directly with farmer-owned organisations in India — pure products,
             better pricing, and a middlemen-free supply chain.
           </p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4">
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/join"
               className="inline-block rounded-full bg-saffron px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-saffron/90"
             >
               Become a Member — ${MEMBERSHIP.joiningFee}
+            </Link>
+            <Link
+              href="/invest"
+              className="inline-block rounded-full border border-green/30 bg-white px-8 py-4 text-base font-semibold text-green shadow-sm transition hover:bg-green/5"
+            >
+              Invest
             </Link>
           </div>
           <p className="mt-4 text-sm text-soil/60">

@@ -103,7 +103,7 @@ export default async function WelcomePage({
           What happens next
         </h2>
         <ul className="mt-3 space-y-2 text-sm text-soil/75">
-          <li>A confirmation email has been sent to {member.email}</li>
+          <li>We&apos;ve emailed your certificate and member ID to {member.email}</li>
           <li>You&apos;ll receive updates as our Texas store opening approaches</li>
           <li>As a member-owner, you have access to member pricing, products, and fulfillment</li>
           <li>Voting rights require a separate USD 1,000+ capital investment</li>

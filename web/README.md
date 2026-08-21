@@ -38,6 +38,9 @@ Copy `.env.example` to `.env.local` and configure:
 | `SUPABASE_SERVICE_ROLE_KEY` | **Required on Netlify** | Supabase service role key |
 | `ADMIN_EXPORT_KEY` | Optional | Bearer token for CSV export APIs; also the one-time **setup key** used to create the first admin account at `/admin/setup` |
 | `CERT_SIGNING_SECRET` | Recommended | HMAC secret signing certificate/ID verification codes and the instructions-page access tokens. Set a long random string in production; a dev fallback is used if unset. |
+| `RESEND_API_KEY` | For emailing certificates | Resend API key. Emails the certificate and ID card after Join/Invest. |
+| `EMAIL_FROM` | For emailing certificates | From address, e.g. `HarvestLinx Cooperative <harvestlinx@gmail.com>`. Resend requires a verified domain. |
+| `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` | Alternative to Resend | SMTP (e.g. Gmail). `SMTP_PORT` defaults to 587. |
 
 Without Supabase, records are stored in `data/*.json` (local dev only — not persisted on Netlify).
 
@@ -83,6 +86,7 @@ For security, also run `supabase/migration-rls.sql` (enables Row Level Security 
    - `NEXT_PUBLIC_SITE_URL` = your Netlify site URL (e.g. `https://your-site.netlify.app`)
    - Optional PayPal: `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_MODE=live`
    - Optional Stripe: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
+   - Optional email (certificate/ID): `RESEND_API_KEY` and `EMAIL_FROM`, or `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS`
 5. Deploy.
 
 **Option B — Netlify CLI**

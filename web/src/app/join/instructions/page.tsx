@@ -114,6 +114,7 @@ export default async function InstructionsPage({
           What happens next
         </h2>
         <ul className="mt-3 space-y-2 text-sm text-soil/75">
+          <li>A copy of your certificate and member ID was emailed to {application.email}</li>
           <li>Send payment using your reference number in the memo</li>
           <li>We&apos;ll email {application.email} when your membership is active</li>
           <li>You&apos;ll receive updates as our Texas store opening approaches</li>

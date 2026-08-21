@@ -3,6 +3,8 @@ import { INVESTOR, MEMBERSHIP } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/site-url";
 import { createMember, getMemberByPayPalOrderId } from "@/lib/members";
 import { capturePayPalOrder } from "@/lib/paypal";
+import { sendCredentialEmail } from "@/lib/credential-email";
+import { credentialSourceFromMember } from "@/lib/credential";
 import {
   deletePendingCheckout,
   getPendingCheckout,
@@ -28,7 +30,7 @@ async function finalizeCapturedOrder(
 
   const isMembership = pending.kind === "membership";
 
-  await createMember({
+  const member = await createMember({
     fullName: pending.fullName,
     email: pending.email,
     phone: pending.phone,
@@ -49,7 +51,12 @@ async function finalizeCapturedOrder(
     paypalOrderId: orderId,
     isFoundingMember: true,
     membershipPaid: isMembership,
+    acknowledgements: pending.acknowledgements ?? null,
   });
+
+  await sendCredentialEmail(
+    credentialSourceFromMember(member, pending.kind)
+  );
 
   await deletePendingCheckout(pendingId);
 }

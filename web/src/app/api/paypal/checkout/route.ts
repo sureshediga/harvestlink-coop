@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     const pending = await createPendingCheckout({
       kind: "membership",
       investmentUnits: 0,
+      acknowledgements: data.acknowledgements,
       ...member,
     });
 

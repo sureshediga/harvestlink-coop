@@ -20,16 +20,27 @@ export const MEMBERSHIP_TAGLINE =
 
 export const MEMBER_COUNT = {
   label: "founding members",
+  investorsLabel: "investors",
   tagline: MEMBERSHIP_TAGLINE,
-  fallbackHeadline: "Be among our founding members",
+  fallbackHeadline: "Be among our founding members and investors",
 } as const;
 
 export const CERTIFICATE = {
   title: "Proud Farmer Cooperative Member",
   org: "HarvestLinx Cooperative",
+  eyebrow: "Founding Membership Certificate",
   body: "Proud to source produce directly from farmer-owned organisations",
   tagline: MEMBERSHIP_TAGLINE,
   note: "Membership activates after joining-fee payment is confirmed",
+} as const;
+
+export const INVESTOR_CERTIFICATE = {
+  title: "Proud Cooperative Investor",
+  org: "HarvestLinx Cooperative",
+  eyebrow: "Investor Certificate",
+  body: "Proud to invest in farmer-owned organisations and a middlemen-free supply chain",
+  tagline: MEMBERSHIP_TAGLINE,
+  note: "Investment is recorded after payment is confirmed",
 } as const;
 
 export const MEMBERSHIP = {
@@ -69,12 +80,49 @@ export const INVESTOR = {
   summary:
     "Members who invest USD 1,000 or more in cooperative capital receive voting rights and dividends proportional to their investment — one member, one vote among voting members.",
   benefits: [
-    "Voting rights for members with USD 1,000+ invested capital",
-    "Dividends proportional to your investment amount",
-    "Support farmer-owned aggregation and cooperative export readiness",
-    "Funds cooperative retail stores and logistics",
-    "Transparent, community-driven capital model",
+    {
+      title: "Become part of HarvestLinx's growth",
+      body: "Social Investors help provide the early capital needed to build and grow HarvestLinx. You become more than a customer—you become someone helping the cooperative establish and expand its farmer-to-consumer network.",
+    },
+    {
+      title: "5% Member Pricing",
+      body: "Social Investors receive 5% preferred pricing on eligible HarvestLinx products. This provides an ongoing benefit when purchasing products through the cooperative.",
+    },
+    {
+      title: "$50 Annual Cooperative Credit",
+      body: "Receive a $50 HarvestLinx credit each year that can be used toward eligible purchases. This benefit can begin once the cooperative reaches defined operational or revenue milestones.",
+    },
+    {
+      title: "Early Product Access",
+      body: "Get early access to selected products, seasonal offerings, limited farmer batches, and new products before they are made broadly available.",
+    },
+    {
+      title: "Impact Updates & Future Economic Participation",
+      body: "See how HarvestLinx is making an impact—farmers and FPOs engaged, products sourced, communities reached, and other measurable outcomes. Investors may also participate proportionally in future economic distributions when approved by the cooperative.",
+    },
+    {
+      title: "Quarterly Updates & Founding Investor Recognition",
+      body: "Receive regular updates on HarvestLinx's progress, growth, sourcing, financial direction, and upcoming initiatives. Early investors can also be recognized as Founding Social Investors.",
+    },
+    {
+      title: "Impact Partners Become Long-Term Partners",
+      body: "Higher-level Impact Partners can have a deeper relationship with HarvestLinx—helping support new farmer partnerships, markets, products, and community initiatives as the cooperative grows.",
+    },
+    {
+      title: "Opportunity to Participate in the Investor Advisory Council",
+      body: "Selected investors can participate in an advisory group that provides feedback and ideas to HarvestLinx leadership. The council can help shape strategy while the cooperative retains its established governance structure.",
+    },
+    {
+      title: "Economic Participation Proportional to Investment",
+      body: "Economic participation is based on the amount invested. For example, someone investing $5,000 would have five times the economic participation of someone investing $1,000, assuming investments are made under the same terms. Future distributions would depend on HarvestLinx's performance and the cooperative's approved distribution policy.",
+    },
+    {
+      title: "Returns Are Not Guaranteed",
+      body: "HarvestLinx is a social-impact investment, not a guaranteed-return product. Any future economic distributions depend on the cooperative's performance, financial position, and applicable investment terms.",
+    },
   ],
+  benefitsDraftNote:
+    "This is a work in progress. For additional clarification, please call",
   details: [
     "Minimum USD 1,000 investment for voting rights",
     "Dividends proportional to capital invested",
@@ -84,7 +132,7 @@ export const INVESTOR = {
     "Patron capital supports Phase 1 shipments and farmer-owned partnerships",
   ],
   note:
-    "The USD 100 membership joining fee is required for all members. Capital investment of USD 1,000 or more is optional and grants voting rights. Contact us to discuss investment.",
+    "The USD 100 membership joining fee is required for all members. Capital investment of USD 1,000 or more is optional and grants voting rights. You can invest online in USD 100 increments.",
 } as const;
 
 export const SUPPLY_CHAIN = {
@@ -100,6 +148,7 @@ export const NAV_LINKS = [
   { href: "/how-it-works", label: "How It Works" },
   { href: "/farmers", label: "FPO Partners" },
   { href: "/membership", label: "Membership" },
+  { href: "/invest", label: "Invest" },
   { href: "/texas", label: "Texas" },
   { href: "/faq", label: "FAQ" },
 ] as const;
@@ -297,7 +346,7 @@ export const FAQ_ITEMS = [
   {
     question: "What is the difference between membership and investment?",
     answer:
-      "Membership is USD 100 one-time online — it gives you access to member pricing, products, and fulfillment. Investment of USD 1,000 or more is separate patron capital that grants voting rights and dividends proportional to your investment. For investment opportunities, please call 614-961-9552.",
+      "Membership is USD 100 one-time online — it gives you access to member pricing, products, and fulfillment. Investment of USD 1,000 or more is separate patron capital that grants voting rights and dividends proportional to your investment. You can invest online or call 614-961-9552.",
   },
   {
     question: "How does the farmer-owned supply chain work?",
@@ -322,7 +371,7 @@ export const FAQ_ITEMS = [
   {
     question: "Can I invest without being a member?",
     answer:
-      "Membership is required. The USD 100 joining fee makes you a member; USD 1,000 or more in patron capital grants voting rights and proportional dividends. Call 614-961-9552 to discuss investment.",
+      "Membership is required. The USD 100 joining fee makes you a member; USD 1,000 or more in patron capital grants voting rights and proportional dividends. Join first, then invest online — or call 614-961-9552.",
   },
 ] as const;
 

@@ -71,6 +71,12 @@ export function Footer() {
             >
               Join — ${MEMBERSHIP.joiningFee}
             </Link>
+            <Link
+              href="/invest"
+              className="mt-3 inline-block rounded-full border border-gold/40 px-6 py-3 text-center text-sm font-semibold text-gold transition hover:bg-white/5"
+            >
+              Invest
+            </Link>
             <OtherMembershipNote variant="dark" className="mt-4" />
           </div>
         </div>

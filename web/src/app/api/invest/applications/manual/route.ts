@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { createApplication } from "@/lib/applications";
 import { publicApiErrorMessage } from "@/lib/api-errors";
-import { investmentCheckoutSchema } from "@/lib/schemas";
+import {
+  investmentCheckoutSchema,
+  memberInfoFromInvestmentCheckout,
+} from "@/lib/schemas";
+import { sendCredentialEmail } from "@/lib/credential-email";
+import { credentialSourceFromApplication } from "@/lib/credential";
+import { instructionsViewUrl } from "@/lib/credential-links";
 import { signAccessToken } from "@/lib/verify";
 
 export async function POST(request: Request) {
@@ -17,23 +23,26 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
+    const member = memberInfoFromInvestmentCheckout(data);
     const application = await createApplication({
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      street: data.street,
-      city: data.city,
-      state: data.state,
-      zip: data.zip,
+      ...member,
       kind: "investment",
       investmentUnits: data.investmentUnits,
       memberNumber: data.memberNumber,
+      acknowledgements: data.acknowledgements,
     });
+
+    const accessToken = signAccessToken(application.referenceNumber);
+    const emailSent = await sendCredentialEmail(
+      credentialSourceFromApplication(application),
+      instructionsViewUrl("investment", application.referenceNumber)
+    );
 
     return NextResponse.json({
       referenceNumber: application.referenceNumber,
       totalAmount: application.totalAmount,
-      accessToken: signAccessToken(application.referenceNumber),
+      accessToken,
+      emailSent,
     });
   } catch (error) {
     console.error("Manual investment application error:", error);

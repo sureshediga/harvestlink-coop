@@ -275,9 +275,9 @@ export function AdminDashboard({ email }: { email: string }) {
                   <td className="px-4 py-3 capitalize text-soil/70">{a.kind}</td>
                   <td className="px-4 py-3 text-soil/70">
                     ${(a.totalAmount / 100).toFixed(2)}
-                    {a.kind === "investment" && a.investmentUnits > 0 && (
+                    {a.kind === "investment" && a.investmentAmount > 0 && (
                       <div className="text-xs text-soil/50">
-                        {a.investmentUnits} unit(s)
+                        ${(a.investmentAmount / 100).toFixed(0)} invested
                       </div>
                     )}
                   </td>

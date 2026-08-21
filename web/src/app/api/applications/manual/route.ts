@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createApplication, DuplicateSignupError } from "@/lib/applications";
 import { publicApiErrorMessage } from "@/lib/api-errors";
 import { membershipCheckoutSchema } from "@/lib/schemas";
+import { sendCredentialEmail } from "@/lib/credential-email";
+import { credentialSourceFromApplication } from "@/lib/credential";
+import { instructionsViewUrl } from "@/lib/credential-links";
 import { signAccessToken } from "@/lib/verify";
 
 export async function POST(request: Request) {
@@ -30,10 +33,17 @@ export async function POST(request: Request) {
       acknowledgements: data.acknowledgements,
     });
 
+    const accessToken = signAccessToken(application.referenceNumber);
+    const emailSent = await sendCredentialEmail(
+      credentialSourceFromApplication(application),
+      instructionsViewUrl("membership", application.referenceNumber)
+    );
+
     return NextResponse.json({
       referenceNumber: application.referenceNumber,
       totalAmount: application.totalAmount,
-      accessToken: signAccessToken(application.referenceNumber),
+      accessToken,
+      emailSent,
     });
   } catch (error) {
     if (error instanceof DuplicateSignupError) {

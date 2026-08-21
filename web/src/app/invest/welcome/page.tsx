@@ -81,6 +81,10 @@ export default async function InvestWelcomePage({
         </dl>
       </div>
 
+      <p className="mt-8 text-sm text-soil/70">
+        We&apos;ve emailed your investor certificate and ID card to {member.email}.
+      </p>
+
       <Link href="/" className="mt-10 inline-block rounded-full bg-saffron px-8 py-3.5 text-sm font-semibold text-white">
         Back to Home
       </Link>

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { INVESTOR } from "@/lib/constants";
-import { investmentCheckoutSchema } from "@/lib/schemas";
+import {
+  investmentCheckoutSchema,
+  memberInfoFromInvestmentCheckout,
+} from "@/lib/schemas";
 import { getSiteUrl } from "@/lib/site-url";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 
@@ -27,6 +30,7 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
+    const member = memberInfoFromInvestmentCheckout(data);
     const siteUrl = getSiteUrl();
     const stripe = getStripe();
     const total = data.investmentUnits * INVESTOR.unitAmount * 100;
@@ -34,13 +38,13 @@ export async function POST(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
-      customer_email: data.email,
+      customer_email: member.email,
       line_items: [
         {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `HarvestLinx Cooperative Investment (${data.investmentUnits} units)`,
+              name: `HarvestLinx Cooperative Investment ($${total / 100})`,
               description:
                 "Patron capital — dividends proportional, voting rights equal",
             },
@@ -53,13 +57,13 @@ export async function POST(request: Request) {
       cancel_url: `${siteUrl}/invest?cancelled=true`,
       metadata: {
         kind: "investment",
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        street: data.street,
-        city: data.city,
-        state: data.state,
-        zip: data.zip,
+        fullName: member.fullName,
+        email: member.email,
+        phone: member.phone,
+        street: member.street,
+        city: member.city,
+        state: member.state,
+        zip: member.zip,
         investmentUnits: String(data.investmentUnits),
         memberNumber: data.memberNumber ?? "",
       },

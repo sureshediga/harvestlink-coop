@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isPayPalConfigured } from "@/lib/paypal";
 import { isStripeConfigured } from "@/lib/stripe";
+import { emailStatus } from "@/lib/email";
 import { isStorageUnreachable, readBlobJson } from "@/lib/blob-store";
 import { getSupabase, isProductionHosting } from "@/lib/supabase";
 import { getSiteUrl } from "@/lib/site-url";
@@ -92,6 +93,7 @@ export async function GET() {
     siteUrl: getSiteUrl(),
     paypalConfigured: isPayPalConfigured(),
     stripeConfigured: isStripeConfigured(),
+    ...emailStatus(),
     supabaseReachable,
     supabaseError,
     blobsAvailable,

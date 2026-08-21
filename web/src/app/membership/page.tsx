@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CTABand } from "@/components/CTABand";
+import { InvestorBenefits } from "@/components/InvestorBenefits";
 import { OtherMembershipNote } from "@/components/OtherMembershipNote";
 import { PageHero, Section } from "@/components/PageShell";
 import { WaysToPay } from "@/components/WaysToPay";
@@ -76,7 +77,14 @@ export default function MembershipPage() {
               <li key={item}>• {item}</li>
             ))}
           </ul>
+          <InvestorBenefits className="mt-8" />
           <OtherMembershipNote className="mt-6" />
+          <Link
+            href="/invest"
+            className="mt-6 inline-block rounded-full bg-green px-6 py-3 text-sm font-semibold text-white hover:bg-green/90"
+          >
+            Invest online
+          </Link>
         </div>
       </Section>
 
@@ -91,18 +99,24 @@ export default function MembershipPage() {
       <Section title="How to pay" className="bg-white">
         <WaysToPay />
         <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-soil/70">
-          Prefer PayPal or a card? Those options appear on the membership
-          application when they are enabled.
+          Prefer PayPal or a card? Those options appear on the join or invest
+          form when they are enabled.
         </p>
-        <div className="mt-8 text-center">
+        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             href="/join"
             className="inline-block rounded-full bg-saffron px-8 py-3.5 text-sm font-semibold text-white hover:bg-saffron/90"
           >
             Start Membership Application — ${MEMBERSHIP.joiningFee}
           </Link>
-          <OtherMembershipNote className="mx-auto mt-6 max-w-md text-center" />
+          <Link
+            href="/invest"
+            className="inline-block rounded-full border border-green/30 bg-white px-8 py-3.5 text-sm font-semibold text-green hover:bg-green/5"
+          >
+            Invest
+          </Link>
         </div>
+        <OtherMembershipNote className="mx-auto mt-6 max-w-md text-center" />
       </Section>
 
       <CTABand buttonText={`Become a Member — $${MEMBERSHIP.joiningFee}`} />

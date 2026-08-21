@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  AcknowledgementPanel,
-  FormAcknowledgementRow,
-} from "./AcknowledgementPanel";
-import { OtherMembershipNote } from "./OtherMembershipNote";
+import { AcknowledgementPanel, FormAcknowledgementRow } from "./AcknowledgementPanel";
 import {
   PaymentChoices,
   type PaymentProviderChoice,
@@ -16,6 +12,7 @@ import {
   MEMBERSHIP_DISCLAIMERS,
   type DisclaimerId,
 } from "@/lib/disclaimers";
+import { useScrollToTopOnChange } from "@/lib/use-scroll-to-top-on-change";
 import type {
   EnrollmentAcknowledgement,
   FormAcknowledgement,
@@ -25,6 +22,7 @@ const STEPS = ["Why Join", "Review & Sign"];
 
 export function JoinForm() {
   const [step, setStep] = useState(1);
+  const topRef = useScrollToTopOnChange(step);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [complianceAck, setComplianceAck] = useState<FormAcknowledgement | null>(
     null
@@ -139,7 +137,11 @@ export function JoinForm() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+    <div
+      ref={topRef}
+      tabIndex={-1}
+      className="mx-auto max-w-2xl px-4 py-10 sm:px-6 outline-none"
+    >
       <StepIndicator currentStep={step} steps={STEPS} />
 
       {step === 1 && (
@@ -292,8 +294,6 @@ export function JoinForm() {
             paypalNote="Pay now with PayPal or a linked card. Membership activates as soon as PayPal confirms the payment."
             stripeNote="Pay now with a debit or credit card via Stripe. Membership activates after Stripe confirms the payment."
           />
-
-          <OtherMembershipNote className="mt-6 rounded-xl border border-gold/15 bg-cream/30 p-4 text-center" />
 
           <button
             type="button"

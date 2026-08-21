@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CERTIFICATE, SITE } from "@/lib/constants";
+import { CERTIFICATE, INVESTOR_CERTIFICATE, SITE } from "@/lib/constants";
 
 type Props = {
   name: string;
@@ -12,7 +12,12 @@ type Props = {
   isActive?: boolean;
   qrDataUrl?: string;
   verifyUrl?: string;
+  variant?: "membership" | "investment";
 };
+
+function copyFor(variant: Props["variant"]) {
+  return variant === "investment" ? INVESTOR_CERTIFICATE : CERTIFICATE;
+}
 
 function drawWrappedText(
   ctx: CanvasRenderingContext2D,
@@ -86,6 +91,7 @@ function drawStatusPill(
 }
 
 async function buildCertificatePng(props: Props): Promise<string> {
+  const copy = copyFor(props.variant);
   const width = 1080;
   const height = 1350;
   const canvas = document.createElement("canvas");
@@ -119,11 +125,11 @@ async function buildCertificatePng(props: Props): Promise<string> {
 
   ctx.fillStyle = gold;
   ctx.font = "22px Georgia, serif";
-  ctx.fillText("FOUNDING MEMBERSHIP CERTIFICATE", centerX, 205);
+  ctx.fillText(copy.eyebrow.toUpperCase(), centerX, 205);
 
   ctx.fillStyle = soil;
   ctx.font = "bold 56px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.title, centerX, 300, width - 260, 62);
+  drawWrappedText(ctx, copy.title, centerX, 300, width - 260, 62);
 
   ctx.fillStyle = soil;
   ctx.font = "italic 26px Georgia, serif";
@@ -148,11 +154,11 @@ async function buildCertificatePng(props: Props): Promise<string> {
 
   ctx.fillStyle = soil;
   ctx.font = "28px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.body, centerX, 660, width - 320, 40);
+  drawWrappedText(ctx, copy.body, centerX, 660, width - 320, 40);
 
   ctx.fillStyle = green;
   ctx.font = "italic 26px Georgia, serif";
-  drawWrappedText(ctx, CERTIFICATE.tagline, centerX, 760, width - 320, 38);
+  drawWrappedText(ctx, copy.tagline, centerX, 760, width - 320, 38);
 
   ctx.fillStyle = soil;
   ctx.font = "bold 24px Georgia, serif";
@@ -196,7 +202,9 @@ export function MembershipCertificate({
   isActive,
   qrDataUrl,
   verifyUrl,
+  variant = "membership",
 }: Props) {
+  const copy = copyFor(variant);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
 
@@ -217,6 +225,7 @@ export function MembershipCertificate({
         statusLabel,
         isActive,
         qrDataUrl,
+        variant,
       });
       const link = document.createElement("a");
       link.href = dataUrl;
@@ -242,13 +251,13 @@ export function MembershipCertificate({
             {SITE.legalName}
           </p>
           <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-gold">
-            Founding Membership Certificate
+            {copy.eyebrow}
           </p>
         </div>
 
         <div className="px-6 py-8 text-center sm:px-10 sm:py-10">
           <h2 className="font-serif text-3xl font-bold text-soil sm:text-4xl">
-            {CERTIFICATE.title}
+            {copy.title}
           </h2>
 
           <p className="mt-6 text-sm italic text-soil/70">This certifies that</p>
@@ -263,10 +272,10 @@ export function MembershipCertificate({
           <div className="mx-auto mt-3 h-px w-48 bg-gold/60" />
 
           <p className="mx-auto mt-6 max-w-md text-base text-soil/80">
-            {CERTIFICATE.body}
+            {copy.body}
           </p>
           <p className="mx-auto mt-5 max-w-md font-serif text-lg italic text-green">
-            {CERTIFICATE.tagline}
+            {copy.tagline}
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-1 text-sm text-soil">
@@ -303,7 +312,7 @@ export function MembershipCertificate({
           )}
 
           <p className="mx-auto mt-6 max-w-sm text-xs text-soil/50">
-            {CERTIFICATE.note}
+            {copy.note}
           </p>
         </div>
       </div>

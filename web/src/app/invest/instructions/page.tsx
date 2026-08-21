@@ -57,15 +57,15 @@ export default async function InvestInstructionsPage({
           Complete Your Investment Payment
         </h1>
         <p className="mt-3 text-soil/75">
-          Reference <strong>{application.referenceNumber}</strong> — invest{" "}
-          {application.investmentUnits} unit(s). We&apos;ll confirm within 1–2 business
-          days after payment.
+          Reference <strong>{application.referenceNumber}</strong> — invest $
+          {(application.investmentAmount / 100).toFixed(0)}. We&apos;ll confirm
+          within 1–2 business days after payment.
         </p>
       </div>
 
       <div className="mx-auto mt-10 max-w-xl">
         <h2 className="text-center font-serif text-lg font-semibold text-soil">
-          Your Cooperative Certificate
+          Your Investor Certificate
         </h2>
         <div className="mt-4">
           <MembershipCertificate
@@ -77,13 +77,14 @@ export default async function InvestInstructionsPage({
             isActive={credential.isActive}
             qrDataUrl={credential.qrDataUrl}
             verifyUrl={credential.verifyUrl}
+            variant="investment"
           />
         </div>
       </div>
 
       <div className="mx-auto mt-12 max-w-xl">
         <h2 className="text-center font-serif text-lg font-semibold text-soil">
-          Your Member ID Card
+          Your Investor ID Card
         </h2>
         <div className="mt-4">
           <MemberIdCard
@@ -104,6 +105,13 @@ export default async function InvestInstructionsPage({
           referenceNumber={application.referenceNumber}
           totalDollars={application.totalAmount / 100}
         />
+      </div>
+
+      <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gold/20">
+        <p className="text-center text-sm text-soil/75">
+          A copy of your investor certificate and ID was emailed to{" "}
+          {application.email}.
+        </p>
       </div>
 
       <div className="mt-8 text-center">

@@ -1,14 +1,24 @@
 import { NextResponse } from "next/server";
-import { listMembers } from "@/lib/members";
+import { getCommunityCountsSafe } from "@/lib/community-counts";
 
-// Count reflects confirmed member records; never statically cached.
+// Count reflects current member and investor records; never statically cached.
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   try {
-    const members = await listMembers();
-    return NextResponse.json({ count: members.length });
+    const counts = await getCommunityCountsSafe();
+    if (!counts) {
+      return NextResponse.json(
+        { error: "Unable to load member count" },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json({
+      count: counts.members,
+      members: counts.members,
+      investors: counts.investors,
+    });
   } catch (error) {
     console.error("Member count error:", error);
     return NextResponse.json(

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { investmentCheckoutSchema } from "@/lib/schemas";
+import {
+  investmentCheckoutSchema,
+  memberInfoFromInvestmentCheckout,
+} from "@/lib/schemas";
 import { createPendingCheckout } from "@/lib/pending-checkout";
 import { createPayPalOrder, isPayPalConfigured } from "@/lib/paypal";
 
@@ -23,17 +26,13 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
+    const member = memberInfoFromInvestmentCheckout(data);
     const pending = await createPendingCheckout({
       kind: "investment",
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      street: data.street,
-      city: data.city,
-      state: data.state,
-      zip: data.zip,
+      ...member,
       investmentUnits: data.investmentUnits,
       memberNumber: data.memberNumber,
+      acknowledgements: data.acknowledgements,
     });
 
     const { approvalUrl } = await createPayPalOrder({

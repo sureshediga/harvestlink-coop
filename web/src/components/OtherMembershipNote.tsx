@@ -1,4 +1,5 @@
 import { INVESTOR, MANUAL_PAYMENT } from "@/lib/constants";
+import Link from "next/link";
 
 type OtherMembershipNoteProps = {
   className?: string;
@@ -22,7 +23,11 @@ export function OtherMembershipNote({
       <span className="inline">
         Members investing USD {INVESTOR.minimumVotingAmount.toLocaleString()} or
         more receive voting rights and dividends proportional to their
-        investment. To discuss investment, please call{" "}
+        investment.{" "}
+        <Link href="/invest" className="font-semibold hover:underline">
+          Invest online
+        </Link>{" "}
+        or call{" "}
         <a
           href={phoneHref}
           className="inline whitespace-nowrap font-semibold hover:underline"

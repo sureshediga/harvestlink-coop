@@ -4,13 +4,14 @@ import path from "path";
 import { readBlobJson, writeBlobJson } from "./blob-store";
 import { isProductionHosting } from "./supabase";
 import type { ApplicationKind } from "./applications";
-import type { MemberInfo } from "./schemas";
+import type { MemberInfo, MembershipAcknowledgements } from "./schemas";
 
 export type PendingCheckout = MemberInfo & {
   id: string;
   kind: ApplicationKind;
   investmentUnits: number;
   memberNumber?: string;
+  acknowledgements?: MembershipAcknowledgements;
   createdAt: string;
 };
 
@@ -60,6 +61,7 @@ export async function createPendingCheckout(
     kind: ApplicationKind;
     investmentUnits: number;
     memberNumber?: string;
+    acknowledgements?: MembershipAcknowledgements;
   }
 ): Promise<PendingCheckout> {
   const record: PendingCheckout = {
@@ -67,6 +69,7 @@ export async function createPendingCheckout(
     kind: data.kind,
     investmentUnits: data.investmentUnits,
     memberNumber: data.memberNumber,
+    acknowledgements: data.acknowledgements,
     fullName: data.fullName,
     email: data.email,
     phone: data.phone,
