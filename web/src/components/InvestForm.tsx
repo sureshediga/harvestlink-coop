@@ -38,7 +38,6 @@ export function InvestForm() {
   const topRef = useScrollToTopOnChange(step);
   const [dollars, setDollars] = useState<number>(INVESTOR.minimumVotingAmount);
   const [customDollars, setCustomDollars] = useState("");
-  const [memberNumber, setMemberNumber] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [complianceAck, setComplianceAck] = useState<FormAcknowledgement | null>(
     null
@@ -115,7 +114,6 @@ export function InvestForm() {
     }
     return {
       investmentUnits,
-      memberNumber: memberNumber.trim() || undefined,
       agreedToTerms: true as const,
       acknowledgements: {
         compliance: complianceAck,
@@ -306,18 +304,6 @@ export function InvestForm() {
               <dd>${dollars.toFixed(2)}</dd>
             </div>
           </dl>
-
-          <label className="mt-6 block">
-            <span className="mb-1.5 block text-sm font-medium text-soil">
-              Member number (if already a member)
-            </span>
-            <input
-              value={memberNumber}
-              onChange={(e) => setMemberNumber(e.target.value)}
-              placeholder="e.g. HL-2026-0001"
-              className={inputClass}
-            />
-          </label>
 
           <div className="mt-6 space-y-3">
             <p className="text-sm font-semibold text-soil">
