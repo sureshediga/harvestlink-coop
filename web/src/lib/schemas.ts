@@ -16,8 +16,14 @@ const contactFieldsSchema = {
     .regex(/^[\d\s\-+()]+$/, "Valid phone number is required"),
   street: z.string().min(3, "Street address is required"),
   city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
-  zip: z.string().regex(/^\d{5}(-\d{4})?$/, "Valid ZIP code is required"),
+  state: z.string().min(2, "State / province / region is required"),
+  zip: z
+    .string()
+    .regex(
+      /^[A-Za-z0-9][A-Za-z0-9 \-]{1,11}$/,
+      "Valid ZIP or postal code is required"
+    ),
+  country: z.string().min(2, "Country is required"),
 };
 
 export const enrollmentAcknowledgementSchema = formAcknowledgementSchema.extend(
@@ -78,6 +84,7 @@ export function memberInfoFromAcknowledgements(
     city: enrollment.city,
     state: enrollment.state,
     zip: enrollment.zip,
+    country: enrollment.country,
   };
 }
 

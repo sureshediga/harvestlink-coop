@@ -6,6 +6,7 @@ import {
   listApplications,
 } from "@/lib/applications";
 import { createMember } from "@/lib/members";
+import { memberAddressFromInfo } from "@/lib/members-types";
 import { getAdminEmail, isAdminAuthorized } from "@/lib/admin-session";
 
 export async function GET(request: Request) {
@@ -71,12 +72,7 @@ export async function POST(request: Request) {
       fullName: application.fullName,
       email: application.email,
       phone: application.phone,
-      address: {
-        street: application.street,
-        city: application.city,
-        state: application.state,
-        zip: application.zip,
-      },
+      address: memberAddressFromInfo(application),
       membershipAmount: application.membershipAmount,
       investmentUnits: application.investmentUnits,
       investmentAmount: application.investmentAmount,

@@ -31,6 +31,7 @@ create table if not exists applications (
   city text not null,
   state text not null,
   zip text not null,
+  country text not null default '',
   investment_units integer not null default 0,
   membership_amount integer not null default 0,
   investment_amount integer not null default 0,

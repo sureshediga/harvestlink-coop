@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import type { PendingApplication } from "@/lib/applications";
+import { formatAddressLocality } from "@/lib/members-types";
 
 type StatusFilter = "all" | "pending_payment" | "confirmed";
 type KindFilter = "all" | "membership" | "investment";
@@ -269,7 +270,7 @@ export function AdminDashboard({ email }: { email: string }) {
                     <div>{a.email}</div>
                     <div className="text-xs text-soil/50">{a.phone}</div>
                     <div className="text-xs text-soil/50">
-                      {a.city}, {a.state} {a.zip}
+                      {formatAddressLocality(a)}
                     </div>
                   </td>
                   <td className="px-4 py-3 capitalize text-soil/70">{a.kind}</td>

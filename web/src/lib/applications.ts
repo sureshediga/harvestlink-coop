@@ -167,6 +167,7 @@ export async function createApplication(
     city: input.city,
     state: input.state,
     zip: input.zip,
+    country: input.country,
     investmentUnits,
     membershipAmount,
     investmentAmount,
@@ -201,11 +202,28 @@ export async function createApplication(
         );
       }
 
-      if (!isStorageUnreachable(error)) {
-        throw new Error(error.message);
-      }
+      if (isMissingCountryColumn(error.message)) {
+        const { error: retryError } = await supabase
+          .from("applications")
+          .insert(mapToDbWithoutCountry(application));
 
-      console.error("Supabase insert unreachable; using fallback storage:", error);
+        if (!retryError) {
+          return application;
+        }
+
+        if (!isStorageUnreachable(retryError)) {
+          throw new Error(retryError.message);
+        }
+
+        console.error(
+          "Supabase insert unreachable after country fallback; using fallback storage:",
+          retryError
+        );
+      } else if (!isStorageUnreachable(error)) {
+        throw new Error(error.message);
+      } else {
+        console.error("Supabase insert unreachable; using fallback storage:", error);
+      }
     } catch (error) {
       if (!isStorageUnreachable(error)) {
         throw error instanceof Error ? error : new Error(String(error));
@@ -396,7 +414,22 @@ export async function confirmApplication(
   return confirmed;
 }
 
-function mapToDb(application: PendingApplication) {
+function isMissingCountryColumn(message: string): boolean {
+  return /Could not find the ['"]country['"] column/i.test(message);
+}
+
+function countryFromRow(row: Record<string, unknown>): string {
+  if (typeof row.country === "string" && row.country.trim()) {
+    return row.country;
+  }
+  const acknowledgements = row.acknowledgements as
+    | MembershipAcknowledgements
+    | null
+    | undefined;
+  return acknowledgements?.enrollmentDisclosure?.country?.trim() || "";
+}
+
+function mapToDbCore(application: PendingApplication) {
   return {
     id: application.id,
     reference_number: application.referenceNumber,
@@ -420,6 +453,17 @@ function mapToDb(application: PendingApplication) {
   };
 }
 
+function mapToDb(application: PendingApplication) {
+  return {
+    ...mapToDbCore(application),
+    country: application.country,
+  };
+}
+
+function mapToDbWithoutCountry(application: PendingApplication) {
+  return mapToDbCore(application);
+}
+
 function mapFromDb(row: Record<string, unknown>): PendingApplication {
   return {
     id: String(row.id),
@@ -432,6 +476,7 @@ function mapFromDb(row: Record<string, unknown>): PendingApplication {
     city: String(row.city),
     state: String(row.state),
     zip: String(row.zip),
+    country: countryFromRow(row),
     investmentUnits: Number(row.investment_units),
     membershipAmount: Number(row.membership_amount),
     investmentAmount: Number(row.investment_amount),
@@ -460,6 +505,7 @@ export function applicationsToCsv(
     "city",
     "state",
     "zip",
+    "country",
     "membership_amount",
     "investment_units",
     "investment_amount",
@@ -485,6 +531,7 @@ export function applicationsToCsv(
       app.city,
       app.state,
       app.zip,
+      app.country,
       (app.membershipAmount / 100).toFixed(2),
       app.investmentUnits,
       (app.investmentAmount / 100).toFixed(2),

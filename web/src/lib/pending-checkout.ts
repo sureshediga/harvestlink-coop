@@ -77,6 +77,7 @@ export async function createPendingCheckout(
     city: data.city,
     state: data.state,
     zip: data.zip,
+    country: data.country,
     createdAt: new Date().toISOString(),
   };
 

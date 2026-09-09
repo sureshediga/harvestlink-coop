@@ -63,6 +63,7 @@ export async function POST(request: Request) {
         city: metadata.city ?? "",
         state: metadata.state ?? "",
         zip: metadata.zip ?? "",
+        country: metadata.country ?? "",
       },
       membershipAmount,
       investmentUnits,

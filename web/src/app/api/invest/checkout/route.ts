@@ -64,6 +64,7 @@ export async function POST(request: Request) {
         city: member.city,
         state: member.state,
         zip: member.zip,
+        country: member.country,
         investmentUnits: String(data.investmentUnits),
         memberNumber: data.memberNumber ?? "",
       },

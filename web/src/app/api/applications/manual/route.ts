@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createApplication, DuplicateSignupError } from "@/lib/applications";
 import { publicApiErrorMessage } from "@/lib/api-errors";
-import { membershipCheckoutSchema } from "@/lib/schemas";
+import { membershipCheckoutSchema, memberInfoFromMembershipCheckout } from "@/lib/schemas";
 import { sendCredentialEmail } from "@/lib/credential-email";
 import { credentialSourceFromApplication } from "@/lib/credential";
 import { instructionsViewUrl } from "@/lib/credential-links";
@@ -20,15 +20,9 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
-    const { enrollmentDisclosure } = data.acknowledgements;
+    const member = memberInfoFromMembershipCheckout(data);
     const application = await createApplication({
-      fullName: enrollmentDisclosure.signedName,
-      email: enrollmentDisclosure.email,
-      phone: enrollmentDisclosure.phone,
-      street: enrollmentDisclosure.street,
-      city: enrollmentDisclosure.city,
-      state: enrollmentDisclosure.state,
-      zip: enrollmentDisclosure.zip,
+      ...member,
       kind: "membership",
       acknowledgements: data.acknowledgements,
     });

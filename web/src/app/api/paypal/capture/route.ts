@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { INVESTOR, MEMBERSHIP } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/site-url";
 import { createMember, getMemberByPayPalOrderId } from "@/lib/members";
+import { memberAddressFromInfo } from "@/lib/members-types";
 import { capturePayPalOrder } from "@/lib/paypal";
 import { sendCredentialEmail } from "@/lib/credential-email";
 import { credentialSourceFromMember } from "@/lib/credential";
@@ -34,12 +35,7 @@ async function finalizeCapturedOrder(
     fullName: pending.fullName,
     email: pending.email,
     phone: pending.phone,
-    address: {
-      street: pending.street,
-      city: pending.city,
-      state: pending.state,
-      zip: pending.zip,
-    },
+      address: memberAddressFromInfo(pending),
     membershipAmount: isMembership ? MEMBERSHIP.joiningFee * 100 : 0,
     investmentUnits: isMembership ? 0 : pending.investmentUnits,
     investmentAmount: isMembership

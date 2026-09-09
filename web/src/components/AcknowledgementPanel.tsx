@@ -5,9 +5,11 @@ import {
   disclaimerDocumentUrl,
   type DisclaimerDefinition,
 } from "@/lib/disclaimers";
-import type {
-  EnrollmentAcknowledgement,
-  FormAcknowledgement,
+import { COUNTRIES, FEATURED_COUNTRIES, isListedCountry } from "@/lib/countries";
+import {
+  enrollmentAcknowledgementSchema,
+  type EnrollmentAcknowledgement,
+  type FormAcknowledgement,
 } from "@/lib/schemas";
 
 type AcknowledgementPanelProps = {
@@ -59,7 +61,12 @@ export function AcknowledgementPanel({
   const [city, setCity] = useState(existingEnrollment?.city ?? "");
   const [state, setState] = useState(existingEnrollment?.state ?? "");
   const [zip, setZip] = useState(existingEnrollment?.zip ?? "");
+  const [country, setCountry] = useState(existingEnrollment?.country ?? "");
   const [error, setError] = useState<string | null>(null);
+
+  const restCountries = COUNTRIES.filter(
+    (name) => !(FEATURED_COUNTRIES as readonly string[]).includes(name)
+  );
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -75,49 +82,23 @@ export function AcknowledgementPanel({
     }
 
     if (collectApplicationInfo) {
-      const trimmedEmail = email.trim();
-      const trimmedPhone = phone.trim();
-      const trimmedStreet = street.trim();
-      const trimmedCity = city.trim();
-      const trimmedState = state.trim();
-      const trimmedZip = zip.trim();
-
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-        setError("Please enter a valid email address.");
-        return;
-      }
-      if (trimmedPhone.length < 10 || !/^[\d\s\-+()]+$/.test(trimmedPhone)) {
-        setError("Please enter a valid phone number.");
-        return;
-      }
-      if (trimmedStreet.length < 3) {
-        setError("Please enter your street address.");
-        return;
-      }
-      if (trimmedCity.length < 2) {
-        setError("Please enter your city.");
-        return;
-      }
-      if (trimmedState.length < 2) {
-        setError("Please enter your state.");
-        return;
-      }
-      if (!/^\d{5}(-\d{4})?$/.test(trimmedZip)) {
-        setError("Please enter a valid ZIP code.");
-        return;
-      }
-
-      onAcknowledge({
+      const parsed = enrollmentAcknowledgementSchema.safeParse({
         signedName: trimmedName,
         signedDate,
         acknowledgedAt: new Date().toISOString(),
-        email: trimmedEmail,
-        phone: trimmedPhone,
-        street: trimmedStreet,
-        city: trimmedCity,
-        state: trimmedState,
-        zip: trimmedZip,
+        email: email.trim(),
+        phone: phone.trim(),
+        street: street.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        zip: zip.trim(),
+        country: country.trim(),
       });
+      if (!parsed.success) {
+        setError(parsed.error.issues[0]?.message ?? "Please check your details.");
+        return;
+      }
+      onAcknowledge(parsed.data);
       return;
     }
 
@@ -235,6 +216,7 @@ export function AcknowledgementPanel({
                   }}
                   className={inputClass}
                   autoComplete="tel"
+                  placeholder="Include country code if outside the US"
                 />
               </label>
               <label className="block sm:col-span-2">
@@ -267,7 +249,7 @@ export function AcknowledgementPanel({
               </label>
               <label className="block">
                 <span className="mb-1.5 block text-sm font-medium text-soil">
-                  State
+                  State / province / region
                 </span>
                 <input
                   value={state}
@@ -277,11 +259,12 @@ export function AcknowledgementPanel({
                   }}
                   className={inputClass}
                   autoComplete="address-level1"
+                  placeholder="e.g. Ohio, Karnataka, Ontario"
                 />
               </label>
-              <label className="block sm:col-span-2">
+              <label className="block">
                 <span className="mb-1.5 block text-sm font-medium text-soil">
-                  ZIP code
+                  ZIP / postal code
                 </span>
                 <input
                   value={zip}
@@ -291,7 +274,40 @@ export function AcknowledgementPanel({
                   }}
                   className={inputClass}
                   autoComplete="postal-code"
+                  placeholder="e.g. 43215, 560001, SW1A 1AA"
                 />
+              </label>
+              <label className="block sm:col-span-2">
+                <span className="mb-1.5 block text-sm font-medium text-soil">
+                  Country
+                </span>
+                <select
+                  value={country}
+                  onChange={(event) => {
+                    setCountry(event.target.value);
+                    setError(null);
+                  }}
+                  className={inputClass}
+                  autoComplete="country-name"
+                >
+                  <option value="">Select country</option>
+                  {country && !isListedCountry(country) ? (
+                    <option value={country}>{country}</option>
+                  ) : null}
+                  {FEATURED_COUNTRIES.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                  <option disabled value="">
+                    ────────────
+                  </option>
+                  {restCountries.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
           )}

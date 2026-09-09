@@ -1,11 +1,39 @@
+import type { MembershipAcknowledgements } from "./schemas";
+
 export type MemberAddress = {
   street: string;
   city: string;
   state: string;
   zip: string;
+  country?: string;
 };
 
-import type { MembershipAcknowledgements } from "./schemas";
+export function memberAddressFromInfo(info: {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country?: string;
+}): MemberAddress {
+  return {
+    street: info.street,
+    city: info.city,
+    state: info.state,
+    zip: info.zip,
+    country: info.country?.trim() || undefined,
+  };
+}
+
+export function formatAddressLocality(address: {
+  city: string;
+  state: string;
+  zip: string;
+  country?: string;
+}): string {
+  const locality = `${address.city}, ${address.state} ${address.zip}`.trim();
+  const country = address.country?.trim();
+  return country ? `${locality}, ${country}` : locality;
+}
 
 export type PaymentProvider = "stripe" | "paypal" | "manual";
 
