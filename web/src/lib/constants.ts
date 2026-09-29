@@ -146,6 +146,7 @@ export { MANUAL_PAYMENT } from "./manual-payment";
 
 export const NAV_LINKS = [
   { href: "/how-it-works", label: "How It Works" },
+  { href: "/products", label: "Products" },
   { href: "/farmers", label: "FPO Partners" },
   { href: "/membership", label: "Membership" },
   { href: "/invest", label: "Invest" },
